@@ -1,7 +1,7 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 import random
-from mesa.space import MultiGrid
+from mesa.space import MultiGrid, SingleGrid
 from mesa.datacollection import DataCollector
 
 class FootballAgent(Agent):
@@ -38,7 +38,7 @@ def compute_gini(model):
     return (1 + (1/N) - 2*B)
 
 class AggressionModel(Model):
-    """A model with some number of agents."""
+    """A model simulating aggression and the onset of riots in crowd behavior."""
     def __init__(self, N, width, height):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
         self.num_agents = N
@@ -53,7 +53,8 @@ class AggressionModel(Model):
             # Add the agent to a random grid cell
             x = random.randrange(self.grid.width)
             y = random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            self.grid.place_agent(a,(x,y))
+            #self.grid.place_agent(a, self.grid.find_empty())
 
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},

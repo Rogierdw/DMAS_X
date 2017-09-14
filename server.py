@@ -18,9 +18,9 @@ def agent_portrayal(agent):
         portrayal["r"] = 0.2
     return portrayal
 
-grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+grid = CanvasGrid(agent_portrayal, 50, 50, 500, 500)
 
-n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 200, 1)
+n_slider = UserSettableParameter('slider', "Number of Agents", 150, 2, 300, 1)
 
 chart = ChartModule([{"Label": "Gini",
                       "Color": "Black"}],
@@ -29,7 +29,7 @@ chart = ChartModule([{"Label": "Gini",
 server = ModularServer(AggressionModel,
                        [grid, chart],
                        "Aggression Model",
-                       {"N": n_slider, "width": 10, "height": 10})
+                       {"N": n_slider, "width": 50, "height": 50})
 
 
 
