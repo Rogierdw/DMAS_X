@@ -50,11 +50,24 @@ class AggressionModel(Model):
             a = FootballAgent(i, self)
             self.schedule.add(a)
 
+
             # Add the agent to a random grid cell
             x = random.randrange(self.grid.width)
             y = random.randrange(self.grid.height)
-            self.grid.place_agent(a,(x,y))
-            #self.grid.place_agent(a, self.grid.find_empty())
+            self.grid.place_agent(a, (x, y))
+
+            '''
+            x = 1
+            y = 1
+            placed = False
+            while not placed:
+                if (x,y) in self.grid.empties:
+                    self.grid.place_agent(a, (x, y))
+                    placed = True
+                else:
+                    x = random.randrange(self.grid.width)
+                    y = random.randrange(self.grid.height)
+            '''
 
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},

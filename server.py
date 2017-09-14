@@ -10,10 +10,10 @@ def agent_portrayal(agent):
                  "r": 0.5}
 
     if agent.aggression > 0:
-        portrayal["Color"] = "red"
+        portrayal["Color"] = "green"
         portrayal["Layer"] = 0
     else:
-        portrayal["Color"] = "grey"
+        portrayal["Color"] = "red"
         portrayal["Layer"] = 1
         portrayal["r"] = 0.2
     return portrayal
