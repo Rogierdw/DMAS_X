@@ -42,8 +42,8 @@ class AggressionModel(Model):
     def __init__(self, N, width, height):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
         self.num_agents = N
-        self.grid = MultiGrid(width, height, True)
-        self.schedule = RandomActivation(self)
+        self.grid = MultiGrid(width, height, True) # Boolean is for wrap-around, SingleGrid would enforce one agent/cell
+        self.schedule = RandomActivation(self) # Means agent activation ordering is random
 
         # Create agents
         for i in range(self.num_agents):
