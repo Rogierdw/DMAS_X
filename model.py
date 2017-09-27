@@ -37,17 +37,29 @@ class FootballAgent(Agent):
 
     def give_aggression(self):
 
+        neighbors = self.model.grid.get_neighbors(
+            self.pos,
+            moore=True,
+            include_center=False
+        )
+
+        if len(neighbors)>0:
+            other = random.choice(neighbors)
+            other.aggression += 1
+            self.aggression -= 1
+
+        '''
         neighborhood = self.model.grid.get_neighborhood(
             self.pos,
             moore=True,  # Moore includes diagonal neighbors. Von Neumann only up/down/left/right
             include_center=False)  # Center cell does or does not count as neighbor
-
-        #cellmates = [agent for agent in self.model.grid.get_cell_list_contents([neighborhood])]
+        
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         if len(cellmates) > 1:
             other = random.choice(cellmates)
             other.aggression += 1
             self.aggression -= 1
+        '''
 
     def step(self):
         self.move()
