@@ -2,11 +2,12 @@ from mesa import Agent
 import random
 
 
-class FootballAgent(Agent):
+class Agent(Agent):
     """ An agent with fixed initial wealth."""
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 1
+        self.model = model
 
     def move(self):
         "Function for moving to empty cell next to agent"
@@ -29,9 +30,6 @@ class FootballAgent(Agent):
                     self.model.grid.move_agent(self, new_position)
                 else:
                     tries += 1
-
-        #new_position = random.choice(possible_steps)
-        #self.model.grid.move_agent(self, new_position)
 
     def give_aggression(self):
 

@@ -7,29 +7,53 @@ from mesa.visualization.UserParam import UserSettableParameter
 def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Filled": "true",
+                 "Layer": 0,
                  "r": 0.5}
 
-    if agent.aggression > 0:
-        portrayal["Color"] = "green"
-        portrayal["Layer"] = 0
-    else:
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 1
-        portrayal["r"] = 0.2
+    if agent.role == 'Fan':
+        portrayal['Color'] = 'green'
+        if agent.aggression > 50:
+            portrayal['r'] = 1
+        else:
+            portrayal["r"] = agent.aggression/100
+
+    if agent.role == 'Hooligan':
+        portrayal['Color'] = 'red'
+        if agent.aggression > 50:
+            portrayal['r'] = 1
+        else:
+            portrayal["r"] = agent.aggression/100
+
+    if agent.role == 'Police':
+        portrayal['Color'] = 'blue'
+
+    if agent.role == 'Riot Police':
+        portrayal['Color'] = 'purple'
+
     return portrayal
 
 grid = CanvasGrid(agent_portrayal, 50, 50, 500, 500)
 
-n_slider = UserSettableParameter('slider', "Number of Agents", 150, 2, 300, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 250, 2, 300, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 50, 2, 300, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 100, 2, 300, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 25, 2, 300, 1)
 
-chart = ChartModule([{"Label": "Gini",
+
+
+
+chart = ChartModule([{"Label": "Riot",
                       "Color": "Black"}],
                     data_collector_name='datacollector')
 
-server = ModularServer(AggressionModel,
-                       [grid, chart],
-                       "Aggression Model",
-                       {"N": n_slider, "width": 50, "height": 50})
+server = ModularServer(AggressionModel, # Which model
+                       [grid, chart], # Add what to page
+                       "Aggression Model", # Title
+                       {"N_fan": n_slider_fan, # Actual parameters for __init__ of model
+                        "N_hool": n_slider_hool,
+                        "N_pol": n_slider_pol,
+                        "N_riopol": n_slider_riopol,
+                        "width": 50, "height": 50})
 
 
 
