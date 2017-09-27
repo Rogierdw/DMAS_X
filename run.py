@@ -7,7 +7,7 @@ from server import server
 server.port = 8521 # The default
 server.launch()
 
-'''
+
 model = AggressionModel(100, 10, 10)
 for i in range(100):
     model.step()
@@ -51,4 +51,3 @@ run_data = batch_run.get_model_vars_dataframe()
 run_data.head()
 plt.scatter(run_data.N, run_data.Gini)
 plt.show()
-'''
