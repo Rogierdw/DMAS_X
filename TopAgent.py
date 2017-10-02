@@ -6,6 +6,19 @@ class TopAgent(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
 
+
+
+
+     
+    def scanArea(self,range):
+        """ Returns number of agents within a certain range to scan the area """
+        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=range)
+        #print(len(neighbors))
+
+        return len(neighbors)
+        
+
+
     def move(self):
         "Function for moving to empty cell next to agent"
 
@@ -31,6 +44,7 @@ class TopAgent(Agent):
     def step(self):
         self.move()
         self.handle_aggression()
+        self.scanArea(5)
 
     def handle_aggression(self):
         raise NotImplementedError("Should be handled by subclass")
