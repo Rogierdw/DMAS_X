@@ -7,7 +7,7 @@ from mesa.datacollection import DataCollector
 from TopAgent import *
 
 def compute_aggression(model):
-    agent_aggression = [agent.agent_aggression for agent in model.schedule.agents]
+    agent_aggression = [agent.aggression for agent in model.schedule.agents]
     total_aggression = sum(agent_aggression)
     return total_aggression
 
