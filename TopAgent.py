@@ -10,6 +10,8 @@ class TopAgent2(Agent):
         self.aggression = 0
         self.lastscan = 0
         self.model = model
+        self.walkable = 0
+        self.fights = 0
 
     def scanArea(self, range=5):
         """ Returns number of agents within a certain range to scan the area """
@@ -123,27 +125,32 @@ class TopAgent2(Agent):
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
                     if type(contact) is not type(self):
-                        print(str(self) + " WOULD NOW FIGHT WITH " + str(contact) + " BECAUSE AGGRESSION = " + str(self.aggression))
-                        self.aggression = 0
-                        contact.aggression = 0
+                        self.fight(contact)
         else:
             fight = False
         return fight
 
-
-    def move(self, neighbors):
-        raise NotImplementedError("Should be handled by subclass")
+    def fight(self, other):
+        self.fights += .5
+        other.fights += .5
+        self.aggression = 0
+        other.aggression = 0
+        self.walkable = 100
+        other.walkable = 100
 
     def step(self):
-        if self.lastscan >= self.scanfreq:
-            neighbors = self.scanArea()
-            self.lastscan == 0
+        if self.walkable == 0:
+            if self.lastscan >= self.scanfreq:
+                neighbors = self.scanArea()
+                self.lastscan == 0
 
-            self.update_aggression(neighbors)
-            self.move(neighbors)
+                self.update_aggression(neighbors)
+                self.move(neighbors)
+            else:
+                self.standard_move()
+                self.lastscan += 1
         else:
-            self.standard_move()
-            self.lastscan += 1
+            self.walkable -= 1
 
     def update_aggression(self, neighbors):
         raise NotImplementedError("Should be handled by subclass")

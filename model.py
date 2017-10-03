@@ -8,9 +8,9 @@ from TopAgent import *
 
 
 def compute_riot(model):
-    agent_aggressions = [agent.aggression for agent in model.schedule.agents]
-    total_aggression = sum(agent_aggressions)
-    return total_aggression
+    agent_fights = [agent.fights for agent in model.schedule.agents]
+    total_fights = sum(agent_fights)
+    return total_fights
 
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""

@@ -23,6 +23,10 @@ def agent_portrayal(agent):
     if type(agent) is Riot_Police:
         portrayal['Color'] = 'purple'
 
+    if agent.walkable != 0:
+        portrayal['Color'] = 'black'
+        portrayal['r'] = 1.0
+
     return portrayal
 
 grid = CanvasGrid(agent_portrayal, 100, 100, 500, 500)
