@@ -135,8 +135,8 @@ class TopAgent2(Agent):
         other.fights += .5
         self.aggression = 0
         other.aggression = 0
-        self.walkable = 100
-        other.walkable = 100
+        self.walkable = 10
+        other.walkable = 10
 
     def step(self):
         if self.walkable == 0:
@@ -194,7 +194,7 @@ class Hooligan(TopAgent2):
         super().__init__(unique_id, model)
         self.aggression = 0
         self.model = model
-        self.scanfreq = 5
+        self.scanfreq = 3
         self.lastscan = 0
 
     def update_aggression(self, neighbors = None):
@@ -229,7 +229,7 @@ class Police(TopAgent2):
         super().__init__(unique_id, model)
         self.aggression = 0
         self.model = model
-        self.scanfreq = 5
+        self.scanfreq = 20
         self.lastscan = 0
 
     def update_aggression(self, neighbors):
@@ -250,7 +250,7 @@ class Riot_Police(TopAgent2):
         super().__init__(unique_id, model)
         self.aggression = 0
         self.model = model
-        self.scanfreq = 5
+        self.scanfreq = 3
         self.lastscan = 0
 
 

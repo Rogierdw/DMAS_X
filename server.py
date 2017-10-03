@@ -11,6 +11,8 @@ def agent_portrayal(agent):
                  "Layer": 0,
                  "r": 0.5}
 
+
+
     if type(agent) is Fan:
         portrayal['Color'] = 'green'
 
@@ -31,10 +33,10 @@ def agent_portrayal(agent):
 
 grid = CanvasGrid(agent_portrayal, 100, 100, 500, 500)
 
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 170, 2, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 30, 2, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 170, 2, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 30, 2, 400, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 291, 2, 400, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 9, 2, 400, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 97, 2, 400, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 3, 2, 400, 1)
 
 
 
