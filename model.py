@@ -6,8 +6,12 @@ from mesa.datacollection import DataCollector
 #from FootballAgent import FootballAgent
 from TopAgent import *
 
+def compute_aggression(model):
+    agent_aggression = [agent.agent_aggression for agent in model.schedule.agents]
+    total_aggression = sum(agent_aggression)
+    return total_aggression
 
-def compute_riot(model):
+def compute_fights(model):
     agent_fights = [agent.fights for agent in model.schedule.agents]
     total_fights = sum(agent_fights)
     return total_fights
@@ -45,7 +49,7 @@ class AggressionModel(Model):
 
 
         self.datacollector = DataCollector(
-            model_reporters={"Riot": compute_riot},
+            model_reporters={"Riot": compute_aggression},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):
