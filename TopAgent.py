@@ -1,211 +1,260 @@
 from mesa import Agent
 import random
+import numpy as np
 
-class TopAgent(Agent):
+
+class TopAgent2(Agent):
     """ An agent with fixed initial wealth."""
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.scanrange = 5
+        self.aggression = 0
+        self.lastscan = 0
+        self.model = model
 
-
-
-
-     
-    def scanArea(self,range):
+    def scanArea(self, range=5):
         """ Returns number of agents within a certain range to scan the area """
         neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=range)
+        return neighbors
 
-        # initialize numbers list
-        numbers = [0]*4
-
-        # Count number of neighbor TYPES
+    def numbers(self, neighbors):
+        numbers = np.zeros(4)
         for agent in neighbors:
-            if(type(agent) is Fan):
-                numbers[0] = numbers[0] + 1
+            if (type(agent) is Fan):
+                numbers[0] += 1
+            if (type(agent) is Hooligan):
+                numbers[1] += 1
+            if (type(agent) is Police):
+                numbers[2] += 1
+            if (type(agent) is Riot_Police):
+                numbers[3] += 1
+        return numbers
 
-            if(type(agent) is Hooligan):
-                numbers[1] = numbers[0] + 1
+    def get_agent(self, pos):
+        if not self.model.grid.is_cell_empty(pos):
+            agent = self.model.grid.get_neighbors(pos, moore=True, include_center=True, radius=0)
+            return agent
+        else:
+            return None
 
-            if(type(agent) is Police):
-                numbers[2] = numbers[0] + 1
+    def get_quadrant(self, i):
+        zero = [0,1,2,3,4,5,11,12,13,14,15,16,22,23,24,25,26,27,33,34,35,36,37,38,44,45,46,47,48,49]
+        one = [6,7,8,9,10,17,18,19,20,21,28,29,30,31,32,39,40,41,42,43,50,51,52,53,54,60,61,62,63,64]
+        two = [55,56,57,58,59,65,66,67,68,69,76,77,78,79,80,87,88,89,90,91,98,99,100,101,102,109,110,111,112,113]
+        three = [70,71,72,73,74,75,81,82,83,84,85,86,92,93,94,95,96,97,103,104,105,106,107,108,114,115,116,117,118,119]
+        if i in zero:
+            return 0
+        elif i in one:
+            return 1
+        elif i in two:
+            return 2
+        elif i in three:
+            return 3
 
-            if(type(agent) is Riot_Police):
-                numbers[3] = numbers[0] + 1
+    def check_quadrants(self):
+        quadrants = np.zeros((4, 4))
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True, radius=5)
+        i = 0
+        for pos in neighborhood:
+            x = self.get_quadrant(i)
+            agent = self.get_agent(pos)
+            if agent is not None:
+                if type(agent) is Fan:
+                    quadrants[x,0] += 1
+                elif type(agent) is Hooligan:
+                    quadrants[x,1] += 1
+                elif type(agent) is Police:
+                    quadrants[x,2] += 1
+                elif type(agent) is Riot_Police:
+                    quadrants[x,3] += 1
+            i += 1
+        return quadrants
 
-        return (numbers)
-        
+    def standard_move(self):
+        "Standard Function for moving to empty cell next to agent"
+        if random.random() < 0.95:  # 95% chance to randomly move
+            moved = False
+            tries = 0
+            tried = []
+
+            possible_steps = self.model.grid.get_neighborhood(
+                self.pos,
+                moore=True,  # Moore includes diagonal neighbors. Von Neumann only up/down/left/right
+                include_center=False)  # Center cell does or does not count as neighbor
+
+            while not moved and tries <= 8:
+                new_position = random.choice(possible_steps)
+                if new_position not in tried:
+                    tried += new_position
+                    if self.model.grid.is_cell_empty(new_position):
+                        moved = True
+                        self.model.grid.move_agent(self, new_position)
+                    else:
+                        tries += 1
+        else:  # 5% chance to stand still
+            pass
+
+    def move_quadrant(self, togo):
+        possible_steps = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
+        if togo is 0:
+            if self.model.grid.is_cell_empty(possible_steps[0]):
+                self.model.grid.move_agent(possible_steps[0])
+            elif self.model.grid.is_cell_empty(possible_steps[1]):
+                self.model.grid.move_agent(possible_steps[1])
+        elif togo is 1:
+            if self.model.grid.is_cell_empty(possible_steps[2]):
+                self.model.grid.move_agent(possible_steps[2])
+            elif self.model.grid.is_cell_empty(possible_steps[4]):
+                self.model.grid.move_agent(possible_steps[4])
+        elif togo is 2:
+            if self.model.grid.is_cell_empty(possible_steps[3]):
+                self.model.grid.move_agent(possible_steps[3])
+            elif self.model.grid.is_cell_empty(possible_steps[5]):
+                self.model.grid.move_agent(possible_steps[5])
+        elif togo is 3:
+            if self.model.grid.is_cell_empty(possible_steps[6]):
+                self.model.grid.move_agent(possible_steps[6])
+            elif self.model.grid.is_cell_empty(possible_steps[7]):
+                self.model.grid.move_agent(possible_steps[7])
+
+    def check_fight(self):
+        if self.aggression > 25:
+            fight = True
+            direct_neighbors = self.scanArea(range=1)
+            if len(direct_neighbors) > 0:
+                for contact in direct_neighbors:
+                    if type(contact) is not type(self):
+                        print(str(self) + " WOULD NOW FIGHT WITH " + str(contact) + " BECAUSE AGGRESSION = " + str(self.aggression))
+                        self.aggression = 0
+                        contact.aggression = 0
+        else:
+            fight = False
+        return fight
 
 
-    def move(self):
-        "Function for moving to empty cell next to agent"
-
-        moved = False
-        tries = 0
-        tried = []
-
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos,
-            moore=True,             # Moore includes diagonal neighbors. Von Neumann only up/down/left/right
-            include_center=False)   # Center cell does or does not count as neighbor
-
-        while not moved and tries <= 8:
-            new_position = random.choice(possible_steps)
-            if new_position not in tried:
-                tried += new_position
-                if self.model.grid.is_cell_empty(new_position):
-                    moved = True
-                    self.model.grid.move_agent(self, new_position)
-                else:
-                    tries += 1
-
-    def step(self):
-        self.move()
-        
-        if(""MODEL STEPS"" % self.scanfreq == 0):
-            neighbors = self.scanArea(scanrange)
-            self.handle_aggression(neighbors)
-
-    def handle_aggression(self,neighbors):
+    def move(self, neighbors):
         raise NotImplementedError("Should be handled by subclass")
 
-class Fan(TopAgent):
+    def step(self):
+        if self.lastscan >= self.scanfreq:
+            neighbors = self.scanArea()
+            self.lastscan == 0
+
+            self.update_aggression(neighbors)
+            self.move(neighbors)
+        else:
+            self.standard_move()
+            self.lastscan += 1
+
+    def update_aggression(self, neighbors):
+        raise NotImplementedError("Should be handled by subclass")
+
+
+class Fan(TopAgent2):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.aggression = 15
-        self.role = 'Fan'
+        self.aggression = 0
+        self.lastscan = 0
         self.model = model
         self.scanfreq = 20
 
-    def handle_aggression(self,neighbors):
-        neighbors = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            include_center=False
-        )
-
-        for other in neighbors:
-            if other.role == 'Fan':
-                pass
-
-            elif other.role == 'Hooligan':
-                if self.aggression < 50:
-                    other.aggression -= 1
-                    self.aggression += 1
-
-            elif other.role == 'Police':
-                if self.aggression > 50:
-                    self.aggression += 1
-                else:
-                    self.aggression -= 2
-
-            elif other.role == 'Riot Police':
-                if self.aggression > 50:
-                    self.aggression += 2
-                else:
-                    self.aggression += 1
-
-        '''
-        if len(neighbors)>0: ## HERE THE ACTUAL AGGRESSION RULES COME IN!
-            other = random.choice(neighbors)
-            if other.aggression > 0:
-                other.aggression += 1
+    def update_aggression(self, neighbors):
+        numbers = self.numbers(neighbors)
+        if np.argmax(numbers)==0:
+            self.aggression += 1
+        else:
             if self.aggression > 0:
                 self.aggression -= 1
-        '''
 
-class Hooligan(TopAgent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-        self.aggression = 35
-        self.role = 'Hooligan'
-        self.model = model
-        self.scanfreq = 3
+    def move(self, neighbors = None):
+        numbers = self.numbers(neighbors)
+        if self.aggression > 15:
+            fight = self.check_fight()
+            if not fight:
+                # move to other group. which one? So move to place where least of own group are
+                togo = np.argmin(self.check_quadrants(), axis=0)[0]
+                self.move_quadrant(togo)
+        else:
+            if np.argmax(numbers) != 0: # Own group not largest
+                # Check quadrant to go to
+                togo = np.argmax(self.check_quadrants(), axis=0)[0]
+                self.move_quadrant(togo)
+            else:
+                self.standard_move()
 
-    def handle_aggression(self,neighbors):
-        neighbors = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            include_center=False
-        )
 
-        for other in neighbors:
-            if other.role == 'Fan':
-                if self.aggression > 50:
-                    other.aggression += 2
-                    self.aggression += 1
-                else:
-                    other.aggression += 1
-
-            elif other.role == 'Hooligan':
-                if self.aggression > 50:
-                    other.aggression += 2
-                else:
-                    other.aggression += 1
-
-            elif other.role == 'Police':
-                if self.aggression > 50:
-                    self.aggression -= 1
-                else:
-                    self.aggression -= 3
-
-            elif other.role == 'Riot Police':
-                if self.aggression > 50:
-                    self.aggression += 2
-                else:
-                    self.aggression += 1
-
-class Police(TopAgent):
+class Hooligan(TopAgent2):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
-        self.role = 'Police'
         self.model = model
-        self.scanfreq=3
+        self.scanfreq = 5
+        self.lastscan = 0
 
-    def handle_aggression(self,neighbors):
-        neighbors = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            include_center=False
-        )
+    def update_aggression(self, neighbors = None):
+        if neighbors is None:
+            self.move()
+        numbers = self.numbers(neighbors)
+        if np.argmax(numbers)==1:
+            self.aggression += 1
+        else:
+            if self.aggression > 0:
+                self.aggression -= 1
 
-        for other in neighbors:
-            if other.role == 'Fan':
-                if other.aggression > 50:
-                    other.aggression -= 1
-                else:
-                    other.aggression += 1
+    def move(self, neighbors = None):
+        numbers = self.numbers(neighbors)
+        if self.aggression > 15:
+            fight = self.check_fight()
+            if not fight:
+                # move to other group. which one? So move to place where least of own group are
+                togo = np.argmin(self.check_quadrants(), axis=0)[1]
+                self.move_quadrant(togo)
+        else:
+            if np.argmax(numbers) != 0: # Own group not largest
+                # Check quadrant to go to
+                togo = np.argmax(self.check_quadrants(), axis=0)[1]
+                self.move_quadrant(togo)
+            else:
+                self.standard_move()
 
-            elif other.role == 'Hooligan':
-                if other.aggression > 50:
-                    other.aggression -= 2
-                else:
-                    other.aggression -= 1
 
-class Riot_Police(TopAgent):
+class Police(TopAgent2):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
-        self.role = 'Riot Police'
         self.model = model
-        self.scanfreq=3
+        self.scanfreq = 5
+        self.lastscan = 0
 
-    def handle_aggression(self,neighbors):
-        neighbors = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            include_center=False
-        )
+    def update_aggression(self, neighbors):
+        pass
 
-        for other in neighbors:
-            if other.role == 'Fan':
-                if other.aggression > 50:
-                    other.aggression -= 2
-                else:
-                    other.aggression -= 1
+    def move(self, neighbors = None):
+        numbers = self.numbers(neighbors)
+        if np.argmax(numbers) != 0: # Own group not largest
+            # Check quadrant to go to
+            togo = np.argmax(self.check_quadrants(), axis=0)[2]
+            self.move_quadrant(togo)
+        else:
+            self.standard_move()
 
-            elif other.role == 'Hooligan':
-                if other.aggression > 50:
-                    other.aggression -= 3
-                else:
-                    other.aggression -= 1
+
+class Riot_Police(TopAgent2):
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+        self.aggression = 0
+        self.model = model
+        self.scanfreq = 5
+        self.lastscan = 0
+
+
+    def update_aggression(self, neighbors):
+        pass
+
+    def move(self, neighbors = None):
+        numbers = self.numbers(neighbors)
+        if np.argmax(numbers) != 0: # Own group not largest
+            # Check quadrant to go to
+            togo = np.argmax(self.check_quadrants(), axis=0)[3]
+            self.move_quadrant(togo)
+        else:
+            self.standard_move()
