@@ -5,6 +5,7 @@ class TopAgent(Agent):
     """ An agent with fixed initial wealth."""
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.scanrange = 5
 
 
 
@@ -13,9 +14,25 @@ class TopAgent(Agent):
     def scanArea(self,range):
         """ Returns number of agents within a certain range to scan the area """
         neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=range)
-        #print(len(neighbors))
 
-        return len(neighbors)
+        # initialize numbers list
+        numbers = [0]*4
+
+        # Count number of neighbor TYPES
+        for agent in neighbors:
+            if(type(agent) is Fan):
+                numbers[0] = numbers[0] + 1
+
+            if(type(agent) is Hooligan):
+                numbers[1] = numbers[0] + 1
+
+            if(type(agent) is Police):
+                numbers[2] = numbers[0] + 1
+
+            if(type(agent) is Riot_Police):
+                numbers[3] = numbers[0] + 1
+
+        return (numbers)
         
 
 
@@ -43,10 +60,12 @@ class TopAgent(Agent):
 
     def step(self):
         self.move()
-        self.handle_aggression()
-        self.scanArea(5)
+        
+        if(""MODEL STEPS"" % self.scanfreq == 0):
+            neighbors = self.scanArea(scanrange)
+            self.handle_aggression(neighbors)
 
-    def handle_aggression(self):
+    def handle_aggression(self,neighbors):
         raise NotImplementedError("Should be handled by subclass")
 
 class Fan(TopAgent):
@@ -55,8 +74,9 @@ class Fan(TopAgent):
         self.aggression = 15
         self.role = 'Fan'
         self.model = model
+        self.scanfreq = 20
 
-    def handle_aggression(self):
+    def handle_aggression(self,neighbors):
         neighbors = self.model.grid.get_neighbors(
             self.pos,
             moore=True,
@@ -99,8 +119,9 @@ class Hooligan(TopAgent):
         self.aggression = 35
         self.role = 'Hooligan'
         self.model = model
+        self.scanfreq = 3
 
-    def handle_aggression(self):
+    def handle_aggression(self,neighbors):
         neighbors = self.model.grid.get_neighbors(
             self.pos,
             moore=True,
@@ -139,8 +160,9 @@ class Police(TopAgent):
         self.aggression = 0
         self.role = 'Police'
         self.model = model
+        self.scanfreq=3
 
-    def handle_aggression(self):
+    def handle_aggression(self,neighbors):
         neighbors = self.model.grid.get_neighbors(
             self.pos,
             moore=True,
@@ -166,8 +188,9 @@ class Riot_Police(TopAgent):
         self.aggression = 0
         self.role = 'Riot Police'
         self.model = model
+        self.scanfreq=3
 
-    def handle_aggression(self):
+    def handle_aggression(self,neighbors):
         neighbors = self.model.grid.get_neighbors(
             self.pos,
             moore=True,
