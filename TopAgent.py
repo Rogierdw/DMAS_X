@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 
-class TopAgent2(Agent):
+class TopAgent(Agent):
     """ An agent with fixed initial wealth."""
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
@@ -39,10 +39,10 @@ class TopAgent2(Agent):
             return None
 
     def get_quadrant(self, i):
-        zero = [0,1,2,3,4,5,11,12,13,14,15,16,22,23,24,25,26,27,33,34,35,36,37,38,44,45,46,47,48,49]
-        one = [6,7,8,9,10,17,18,19,20,21,28,29,30,31,32,39,40,41,42,43,50,51,52,53,54,60,61,62,63,64]
-        two = [55,56,57,58,59,65,66,67,68,69,76,77,78,79,80,87,88,89,90,91,98,99,100,101,102,109,110,111,112,113]
-        three = [70,71,72,73,74,75,81,82,83,84,85,86,92,93,94,95,96,97,103,104,105,106,107,108,114,115,116,117,118,119]
+        zero = [0,1,2,3,4,8,9,10,11,12,17,18,19,20,21,26,27,27,28,29,30]
+        one = [5,6,7,13,14,15,16,22,23,24,25,31,32,33,34,40,41,42,43,44]
+        two = [35,36,37,38,39,45,46,47,48,54,55,56,57,63,64,65,66,72,73,74]
+        three = [49,50,51,52,53,58,59,60,61,62,67,68,69,70,71,75,76,77,78,79]
         if i in zero:
             return 0
         elif i in one:
@@ -54,7 +54,7 @@ class TopAgent2(Agent):
 
     def check_quadrants(self):
         quadrants = np.zeros((4, 4))
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=True, radius=5)
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
         i = 0
         for pos in neighborhood:
             x = self.get_quadrant(i)
@@ -125,6 +125,7 @@ class TopAgent2(Agent):
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
                     if type(contact) is not type(self):
+                        #print(str(type(contact)) + " AND " + str(type(self)))
                         self.fight(contact)
         else:
             fight = False
@@ -135,8 +136,8 @@ class TopAgent2(Agent):
         other.fights += .5
         self.aggression = 0
         other.aggression = 0
-        self.walkable = 10
-        other.walkable = 10
+        self.walkable = 25
+        other.walkable = 25
 
     def step(self):
         if self.walkable == 0:
@@ -156,7 +157,7 @@ class TopAgent2(Agent):
         raise NotImplementedError("Should be handled by subclass")
 
 
-class Fan(TopAgent2):
+class Fan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
@@ -172,24 +173,26 @@ class Fan(TopAgent2):
             if self.aggression > 0:
                 self.aggression -= 1
 
-    def move(self, neighbors = None):
+    def move(self, neighbors):
         numbers = self.numbers(neighbors)
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
                 # move to other group. which one? So move to place where least of own group are
+
                 togo = np.argmin(self.check_quadrants(), axis=0)[0]
                 self.move_quadrant(togo)
         else:
             if np.argmax(numbers) != 0: # Own group not largest
-                # Check quadrant to go to
+                # Check quadrant to go to (own group)
+                print(self.check_quadrants())
                 togo = np.argmax(self.check_quadrants(), axis=0)[0]
                 self.move_quadrant(togo)
             else:
                 self.standard_move()
 
 
-class Hooligan(TopAgent2):
+class Hooligan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
@@ -224,7 +227,7 @@ class Hooligan(TopAgent2):
                 self.standard_move()
 
 
-class Police(TopAgent2):
+class Police(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
@@ -245,7 +248,7 @@ class Police(TopAgent2):
             self.standard_move()
 
 
-class Riot_Police(TopAgent2):
+class Riot_Police(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
