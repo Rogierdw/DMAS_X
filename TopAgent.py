@@ -16,7 +16,7 @@ class TopAgent(Agent):
 
     def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
-        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=self.scanrange)
+        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=range)
         return neighbors
 
     def numbers(self, neighbors):
@@ -143,7 +143,7 @@ class TopAgent(Agent):
     def step(self):
         if self.walkable == 0:
             if self.lastscan >= self.scanfreq:
-                neighbors = self.scanArea()
+                neighbors = self.scanArea(self.scanrange)
                 self.lastscan == 0
 
                 self.update_aggression(neighbors)
