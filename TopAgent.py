@@ -12,10 +12,11 @@ class TopAgent(Agent):
         self.model = model
         self.walkable = 0
         self.fights = 0
+        self.scanrange = 5
 
-    def scanArea(self, range=5):
+    def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
-        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=range)
+        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=self.scanrange)
         return neighbors
 
     def numbers(self, neighbors):
@@ -198,9 +199,7 @@ class Hooligan(TopAgent):
         self.scanfreq = 3
         self.lastscan = 0
 
-    def update_aggression(self, neighbors = None):
-        if neighbors is None:
-            self.move()
+    def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
         if np.argmax(numbers)==1:
             self.aggression += 1
