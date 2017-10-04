@@ -33,8 +33,8 @@ class TopAgent(Agent):
 
     def get_agent(self, pos):
         if not self.model.grid.is_cell_empty(pos):
-            agent = self.model.grid.get_neighbors(pos, moore=True, include_center=True, radius=0)
-            return agent
+            agents = self.model.grid.get_neighbors(pos, moore=True, include_center=True, radius=0)
+            return agents[0]
         else:
             return None
 
@@ -179,13 +179,11 @@ class Fan(TopAgent):
             fight = self.check_fight()
             if not fight:
                 # move to other group. which one? So move to place where least of own group are
-
                 togo = np.argmin(self.check_quadrants(), axis=0)[0]
                 self.move_quadrant(togo)
         else:
             if np.argmax(numbers) != 0: # Own group not largest
                 # Check quadrant to go to (own group)
-                print(self.check_quadrants())
                 togo = np.argmax(self.check_quadrants(), axis=0)[0]
                 self.move_quadrant(togo)
             else:
