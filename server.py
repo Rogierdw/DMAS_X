@@ -25,32 +25,18 @@ def agent_portrayal(agent):
     if type(agent) is Riot_Police:
         portrayal['Color'] = 'purple'
 
-    if agent.walkable != 0:
+    if agent.timesincefight != 0:
         portrayal['Color'] = 'black'
         portrayal['r'] = 1.0
 
     return portrayal
 
-grid = CanvasGrid(agent_portrayal, 100, 100, 1000, 1000)
+grid = CanvasGrid(agent_portrayal, 100, 100, 500, 500)
 
-'''
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 510, 2, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 90, 2, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 170, 2, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 30, 2, 400, 1)
-
-
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 170, 2, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 30, 2, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 170, 2, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 30, 2, 400, 1)
-'''
-
-
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 255, 2, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 45, 2, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 2, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 2, 400, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 255, 0, 400, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 45, 0, 400, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 0, 400, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 0, 400, 1)
 
 
 

@@ -8,9 +8,9 @@ class TopAgent(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
-        self.lastscan = 0
+        self.timesincescan = 0
         self.model = model
-        self.walkable = 0
+        self.timesincefight = 0
         self.fights = 0
         self.scanrange = 5
 
@@ -98,26 +98,26 @@ class TopAgent(Agent):
 
     def move_quadrant(self, togo):
         possible_steps = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
-        if togo is 0:
+        if togo == 0:
             if self.model.grid.is_cell_empty(possible_steps[0]):
-                self.model.grid.move_agent(possible_steps[0])
+               self.model.grid.move_agent(self, possible_steps[0])
             elif self.model.grid.is_cell_empty(possible_steps[1]):
-                self.model.grid.move_agent(possible_steps[1])
-        elif togo is 1:
+                self.model.grid.move_agent(self, possible_steps[1])
+        elif togo == 1:
             if self.model.grid.is_cell_empty(possible_steps[2]):
-                self.model.grid.move_agent(possible_steps[2])
+                self.model.grid.move_agent(self, possible_steps[2])
             elif self.model.grid.is_cell_empty(possible_steps[4]):
-                self.model.grid.move_agent(possible_steps[4])
-        elif togo is 2:
+                self.model.grid.move_agent(self, possible_steps[4])
+        elif togo == 2:
             if self.model.grid.is_cell_empty(possible_steps[3]):
-                self.model.grid.move_agent(possible_steps[3])
+                self.model.grid.move_agent(self, possible_steps[3])
             elif self.model.grid.is_cell_empty(possible_steps[5]):
-                self.model.grid.move_agent(possible_steps[5])
-        elif togo is 3:
+                self.model.grid.move_agent(self, possible_steps[5])
+        elif togo == 3:
             if self.model.grid.is_cell_empty(possible_steps[6]):
-                self.model.grid.move_agent(possible_steps[6])
+                self.model.grid.move_agent(self, possible_steps[6])
             elif self.model.grid.is_cell_empty(possible_steps[7]):
-                self.model.grid.move_agent(possible_steps[7])
+                self.model.grid.move_agent(self, possible_steps[7])
 
     def check_fight(self):
         if self.aggression > 25:
@@ -137,22 +137,22 @@ class TopAgent(Agent):
         other.fights += .5
         self.aggression = 0
         other.aggression = 0
-        self.walkable = 25
-        other.walkable = 25
+        self.timesincefight = 25
+        other.timesincefight = 25
 
     def step(self):
-        if self.walkable == 0:
-            if self.lastscan >= self.scanfreq:
-                neighbors = self.scanArea(self.scanrange)
-                self.lastscan == 0
+        if self.timesincefight == 0:
+            if self.timesincescan >= self.scanfreq:
+                neighbors = self.scanArea(range=self.scanrange)
+                self.timesincescan == 0
 
                 self.update_aggression(neighbors)
                 self.move(neighbors)
             else:
                 self.standard_move()
-                self.lastscan += 1
+                self.timesincescan += 1
         else:
-            self.walkable -= 1
+            self.timesincefight -= 1
 
     def update_aggression(self, neighbors):
         raise NotImplementedError("Should be handled by subclass")
@@ -162,7 +162,7 @@ class Fan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
-        self.lastscan = 0
+        self.timesincescan = 0
         self.model = model
         self.scanfreq = 20
 
@@ -180,8 +180,17 @@ class Fan(TopAgent):
             fight = self.check_fight()
             if not fight:
                 # move to other group. which one? So move to place where least of own group are
-                togo = np.argmin(self.check_quadrants(), axis=0)[0]
-                self.move_quadrant(togo)
+                others = np.delete(self.check_quadrants(), 0, 1)
+                others = others.astype('float')
+                others[others==0] = np.nan
+                x = np.where(others==np.nanmin(others))
+                try:
+                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of neighbours, move to the first lowest one
+                    self.move_quadrant(pos)
+                except IndexError:
+                    self.standard_move()# If there are no other-group members around, move randomly
+
+                #togo = np.argmin(self.check_quadrants(), axis=0)[0]
         else:
             if np.argmax(numbers) != 0: # Own group not largest
                 # Check quadrant to go to (own group)
@@ -190,14 +199,13 @@ class Fan(TopAgent):
             else:
                 self.standard_move()
 
-
 class Hooligan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.aggression = 0
         self.model = model
         self.scanfreq = 3
-        self.lastscan = 0
+        self.timesincescan = 0
 
     def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
@@ -213,8 +221,15 @@ class Hooligan(TopAgent):
             fight = self.check_fight()
             if not fight:
                 # move to other group. which one? So move to place where least of own group are
-                togo = np.argmin(self.check_quadrants(), axis=0)[1]
-                self.move_quadrant(togo)
+                others = np.delete(self.check_quadrants(), 1, 1)
+                others = others.astype('float')
+                others[others == 0] = np.nan
+                x = np.where(others == np.nanmin(others))
+                try:
+                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of neighbours, move to the first lowest one
+                    self.move_quadrant(pos)
+                except IndexError:
+                    self.standard_move()# If there are no other-group members around, move randomly
         else:
             if np.argmax(numbers) != 0: # Own group not largest
                 # Check quadrant to go to
@@ -230,7 +245,7 @@ class Police(TopAgent):
         self.aggression = 0
         self.model = model
         self.scanfreq = 20
-        self.lastscan = 0
+        self.timesincescan = 0
 
     def update_aggression(self, neighbors):
         pass
@@ -251,7 +266,7 @@ class Riot_Police(TopAgent):
         self.aggression = 0
         self.model = model
         self.scanfreq = 3
-        self.lastscan = 0
+        self.timesincescan = 0
 
 
     def update_aggression(self, neighbors):
