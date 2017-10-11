@@ -32,6 +32,7 @@ class TopAgent(Agent):
         self.fights = 0
         self.scanrange = 5
         self.team = team
+        self.agg_thres = 10
 
     def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
@@ -74,6 +75,23 @@ class TopAgent(Agent):
             return 3
 
     def check_quadrants(self):
+        quadrants = np.zeros((4, 3))
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
+        i = 0
+        for pos in neighborhood:
+            x = self.get_quadrant(i)
+            agent = self.get_agent(pos)
+            if agent is not None:
+                if type(agent) is Police or type(agent) is Riot_Police:
+                    quadrants[x,2] += 1
+                if agent.team is self.team:
+                    quadrants[x,0] += 1
+                elif agent.team is not self.team:
+                    quadrants[x,1] += 1
+            i += 1
+        return quadrants
+
+        """
         quadrants = np.zeros((4, 4))
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
         i = 0
@@ -82,15 +100,16 @@ class TopAgent(Agent):
             agent = self.get_agent(pos)
             if agent is not None:
                 if type(agent) is Fan:
-                    quadrants[x,0] += 1
+                    quadrants[x, 0] += 1
                 elif type(agent) is Hooligan:
-                    quadrants[x,1] += 1
+                    quadrants[x, 1] += 1
                 elif type(agent) is Police:
-                    quadrants[x,2] += 1
+                    quadrants[x, 2] += 1
                 elif type(agent) is Riot_Police:
-                    quadrants[x,3] += 1
+                    quadrants[x, 3] += 1
             i += 1
         return quadrants
+        """
 
     def standard_move(self):
         "Standard Function for moving to empty cell next to agent"
@@ -174,8 +193,6 @@ class TopAgent(Agent):
         else:
             self.timesincefight -= 1
 
-    def update_aggression(self, neighbors):
-        raise NotImplementedError("Should be handled by subclass")
 
 
 class Fan(TopAgent):
@@ -185,11 +202,10 @@ class Fan(TopAgent):
 
     def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
-        if np.argmax(numbers)==0:
+        if (numbers[0] -  numbers[1]) >= self.agg_thres:
             self.aggression += 1
-        else:
-            if self.aggression > 0:
-                self.aggression -= 1
+        elif (numbers[1] - numbers[0]) <= -self.agg_thres:
+            self.aggression -= 1
 
     def move(self, neighbors):
         numbers = self.numbers(neighbors)
@@ -223,11 +239,10 @@ class Hooligan(TopAgent):
 
     def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
-        if np.argmax(numbers)==1:
+        if (numbers[0] -  numbers[1]) >= self.agg_thres:
             self.aggression += 1
-        else:
-            if self.aggression > 0:
-                self.aggression -= 1
+        elif (numbers[1] - numbers[0]) <= -self.agg_thres:
+            self.aggression -= 1
 
     def move(self, neighbors = None):
         numbers = self.numbers(neighbors)
