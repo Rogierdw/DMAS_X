@@ -32,6 +32,7 @@ class TopAgent(Agent):
         self.fights = 0
         self.scanrange = 5
         self.team = team
+        self.fightThreshold = 25
         self.group_larger_threshold = 10
 
     def scanArea(self, range):
@@ -159,12 +160,12 @@ class TopAgent(Agent):
                 self.model.grid.move_agent(self, possible_steps[7])
 
     def check_fight(self):
-        if self.aggression > 25:
+        if self.aggression > self.fightThreshold:
             fight = True
             direct_neighbors = self.scanArea(range=1)
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
-                    if type(contact) is not type(self):
+                    if contact.team is not self.team:
                         #print(str(type(contact)) + " AND " + str(type(self)))
                         self.fight(contact)
         else:
