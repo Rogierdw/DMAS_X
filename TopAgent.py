@@ -125,7 +125,7 @@ class TopAgent(Agent):
             direct_neighbors = self.scanArea(range=1)
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
-                    if type(contact) is not type(self):
+                    if type(contact) is Riot_Police or type(contact) is Police: # Only fight with the police
                         #print(str(type(contact)) + " AND " + str(type(self)))
                         self.fight(contact)
         else:
@@ -161,9 +161,6 @@ class TopAgent(Agent):
 class Fan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.aggression = 0
-        self.timesincescan = 0
-        self.model = model
         self.scanfreq = 20
 
     def update_aggression(self, neighbors):
@@ -179,7 +176,7 @@ class Fan(TopAgent):
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
-                # move to other group. which one? So move to place where least of own group are
+                # check presence of other groups
                 others = np.delete(self.check_quadrants(), 0, 1)
                 others = others.astype('float')
                 others[others==0] = np.nan
@@ -202,10 +199,7 @@ class Fan(TopAgent):
 class Hooligan(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.aggression = 0
-        self.model = model
         self.scanfreq = 3
-        self.timesincescan = 0
 
     def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
@@ -220,13 +214,13 @@ class Hooligan(TopAgent):
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
-                # move to other group. which one? So move to place where least of own group are
+                # check presence of other groups
                 others = np.delete(self.check_quadrants(), 1, 1)
                 others = others.astype('float')
                 others[others == 0] = np.nan
                 x = np.where(others == np.nanmin(others))
                 try:
-                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of neighbours, move to the first lowest one
+                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of other groups in scanarea, move to the first lowest one
                     self.move_quadrant(pos)
                 except IndexError:
                     self.standard_move()# If there are no other-group members around, move randomly
@@ -242,10 +236,7 @@ class Hooligan(TopAgent):
 class Police(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.aggression = 0
-        self.model = model
         self.scanfreq = 20
-        self.timesincescan = 0
 
     def update_aggression(self, neighbors):
         pass
@@ -263,10 +254,7 @@ class Police(TopAgent):
 class Riot_Police(TopAgent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.aggression = 0
-        self.model = model
         self.scanfreq = 3
-        self.timesincescan = 0
 
 
     def update_aggression(self, neighbors):

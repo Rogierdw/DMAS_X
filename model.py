@@ -1,9 +1,7 @@
-from mesa import Agent, Model
+from mesa import Model
 from mesa.time import RandomActivation
-import random
-from mesa.space import MultiGrid, SingleGrid
+from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
-#from FootballAgent import FootballAgent
 from TopAgent import *
 
 def compute_aggression(model):
@@ -21,7 +19,7 @@ class AggressionModel(Model):
     def __init__(self, N_fan, N_hool, N_pol, N_riopol, width, height):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
         self.num_agents = N_fan + N_hool + N_pol + N_riopol
-        self.grid = SingleGrid(width, height, True) # Boolean is for wrap-around, SingleGrid would enforce one agent/cell
+        self.grid = SingleGrid(width, height, True) # Boolean is for wrap-around, SingleGrid enforces one agent/cell
         self.schedule = RandomActivation(self) # Means agent activation ordering is random
 
         # Create agents
