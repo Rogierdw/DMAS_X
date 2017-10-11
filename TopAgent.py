@@ -2,9 +2,27 @@ from mesa import Agent
 import random
 import numpy as np
 
+""" 
+TODO in general:
+ - Update aggression model based on multiple agent types. 
+ - Hooligans only fight normal fans now. We should fix this, so either two parties or none. Stop confusing the parties 
+ from the paper of Jager et al with our different agent classes. 
+ - Declare all parameters globally so we can easily tune them during testing
+ - Think about how police and riot police handle aggression
+ - Fix the quadrant functions
+  
+TODO experiment:
+ - Improve visual simulation and think of good ways to plot the data
+ - Implement a certain degree of randomness within an agent class so not all agents of that type behave exactly equal.
+
+TODO smaller details:
+ - Change variable names for sake of clarity
+ - Change class names to match with report (not fans and hooligans)
+ - Comment functions so Bart understands what is happening 
+ """
 
 class TopAgent(Agent):
-    """ An agent with fixed initial wealth."""
+    """ Parameters that are true for all agent types at beginning of simulation."""
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model)
         self.aggression = 0
@@ -21,16 +39,15 @@ class TopAgent(Agent):
         return neighbors
 
     def numbers(self, neighbors):
-        numbers = np.zeros(4)
+        """" Returns array with the numbers of different agent types in the neighborhood (scanarea) of the agent"""
+        numbers = np.zeros(2)
         for agent in neighbors:
-            if (type(agent) is Fan):
-                numbers[0] += 1
-            if (type(agent) is Hooligan):
-                numbers[1] += 1
-            if (type(agent) is Police):
-                numbers[2] += 1
-            if (type(agent) is Riot_Police):
-                numbers[3] += 1
+            if agent.team is not None:
+                if (agent.team is self.team):
+                    numbers[0] += 1
+                if (agent.team is not self.team):
+                    numbers[1] += 1
+        print()
         return numbers
 
     def get_agent(self, pos):
@@ -41,6 +58,7 @@ class TopAgent(Agent):
             return None
 
     def get_quadrant(self, i):
+        """" TODO: Make this less static so we can still tune the scan range of the agents. """
         zero = [0,1,2,3,4,8,9,10,11,12,17,18,19,20,21,26,27,27,28,29,30]
         one = [5,6,7,13,14,15,16,22,23,24,25,31,32,33,34,40,41,42,43,44]
         two = [35,36,37,38,39,45,46,47,48,54,55,56,57,63,64,65,66,72,73,74]
@@ -126,7 +144,7 @@ class TopAgent(Agent):
             direct_neighbors = self.scanArea(range=1)
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
-                    if type(contact) is Riot_Police or type(contact) is Police: # Only fight with the police
+                    if type(contact) is not type(self):
                         #print(str(type(contact)) + " AND " + str(type(self)))
                         self.fight(contact)
         else:
