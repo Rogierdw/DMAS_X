@@ -40,14 +40,15 @@ class TopAgent(Agent):
 
     def numbers(self, neighbors):
         """" Returns array with the numbers of different agent types in the neighborhood (scanarea) of the agent"""
-        numbers = np.zeros(2)
+        numbers = np.zeros(3)
         for agent in neighbors:
+            if type(agent) is Police or type(agent) is Riot_Police:
+                numbers[2] += 1
             if agent.team is not None:
                 if (agent.team is self.team):
                     numbers[0] += 1
                 if (agent.team is not self.team):
                     numbers[1] += 1
-        print()
         return numbers
 
     def get_agent(self, pos):
