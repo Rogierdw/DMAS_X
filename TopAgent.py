@@ -5,7 +5,7 @@ import numpy as np
 
 class TopAgent(Agent):
     """ An agent with fixed initial wealth."""
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model)
         self.aggression = 0
         self.timesincescan = 0
@@ -13,6 +13,7 @@ class TopAgent(Agent):
         self.timesincefight = 0
         self.fights = 0
         self.scanrange = 5
+        self.team = team
 
     def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
@@ -159,8 +160,8 @@ class TopAgent(Agent):
 
 
 class Fan(TopAgent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
         self.scanfreq = 20
 
     def update_aggression(self, neighbors):
@@ -197,8 +198,8 @@ class Fan(TopAgent):
                 self.standard_move()
 
 class Hooligan(TopAgent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
         self.scanfreq = 3
 
     def update_aggression(self, neighbors):
@@ -234,8 +235,8 @@ class Hooligan(TopAgent):
 
 
 class Police(TopAgent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
         self.scanfreq = 20
 
     def update_aggression(self, neighbors):
@@ -252,8 +253,8 @@ class Police(TopAgent):
 
 
 class Riot_Police(TopAgent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
         self.scanfreq = 3
 
 
