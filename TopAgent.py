@@ -32,7 +32,7 @@ class TopAgent(Agent):
         self.fights = 0
         self.scanrange = 5
         self.team = team
-        self.agg_thres = 10
+        self.group_larger_threshold = 10
 
     def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
@@ -193,18 +193,15 @@ class TopAgent(Agent):
         else:
             self.timesincefight -= 1
 
-
-
-class Fan(TopAgent):
+class Non_Police(TopAgent):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
 
     def update_aggression(self, neighbors):
         numbers = self.numbers(neighbors)
-        if (numbers[0] -  numbers[1]) >= self.agg_thres:
+        if (numbers[0] -  numbers[1]) >= self.group_larger_threshold:
             self.aggression += 1
-        elif (numbers[1] - numbers[0]) <= -self.agg_thres:
+        elif (numbers[1] - numbers[0]) <= -self.group_larger_threshold:
             self.aggression -= 1
 
     def move(self, neighbors):
@@ -212,94 +209,57 @@ class Fan(TopAgent):
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
-                # check presence of other groups
+                '''# check presence of other groups
                 others = np.delete(self.check_quadrants(), 0, 1)
                 others = others.astype('float')
                 others[others==0] = np.nan
-                x = np.where(others==np.nanmin(others))
+                x = np.where(others==np.nanmax(others))
                 try:
                     pos = x[0][0],x[0][1]# IF there are any nonzero-values of neighbours, move to the first lowest one
                     self.move_quadrant(pos)
                 except IndexError:
-                    self.standard_move()# If there are no other-group members around, move randomly
-
-                #togo = np.argmin(self.check_quadrants(), axis=0)[0]
-        else:
-            if np.argmax(numbers) != 0: # Own group not largest
-                # Check quadrant to go to (own group)
-                togo = np.argmax(self.check_quadrants(), axis=0)[0]
+                    self.standard_move()# If there are no other-group members around, move randomly'''
+                togo = np.argmax(self.check_quadrants(), axis=0)[1]
                 self.move_quadrant(togo)
-            else:
-                self.standard_move()
+        else:
+            togo = np.argmax(self.check_quadrants(), axis=0)[0]
+            self.move_quadrant(togo)
 
-class Hooligan(TopAgent):
+class Fan(Non_Police):
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
+        self.scanfreq = 20
+
+class Hooligan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
         self.scanfreq = 3
 
-    def update_aggression(self, neighbors):
-        numbers = self.numbers(neighbors)
-        if (numbers[0] -  numbers[1]) >= self.agg_thres:
-            self.aggression += 1
-        elif (numbers[1] - numbers[0]) <= -self.agg_thres:
-            self.aggression -= 1
-
-    def move(self, neighbors = None):
-        numbers = self.numbers(neighbors)
-        if self.aggression > 15:
-            fight = self.check_fight()
-            if not fight:
-                # check presence of other groups
-                others = np.delete(self.check_quadrants(), 1, 1)
-                others = others.astype('float')
-                others[others == 0] = np.nan
-                x = np.where(others == np.nanmin(others))
-                try:
-                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of other groups in scanarea, move to the first lowest one
-                    self.move_quadrant(pos)
-                except IndexError:
-                    self.standard_move()# If there are no other-group members around, move randomly
-        else:
-            if np.argmax(numbers) != 0: # Own group not largest
-                # Check quadrant to go to
-                togo = np.argmax(self.check_quadrants(), axis=0)[1]
-                self.move_quadrant(togo)
-            else:
-                self.standard_move()
-
-
-class Police(TopAgent):
+class Yes_Police(TopAgent):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
 
     def update_aggression(self, neighbors):
         pass
 
     def move(self, neighbors = None):
         numbers = self.numbers(neighbors)
-        if np.argmax(numbers) != 0: # Own group not largest
+        if np.argmax(numbers) != 2: # Police group not largest
             # Check quadrant to go to
             togo = np.argmax(self.check_quadrants(), axis=0)[2]
             self.move_quadrant(togo)
         else:
             self.standard_move()
 
+class Police(Yes_Police):
+    def __init__(self, unique_id, model, team):
+        super().__init__(unique_id, model, team)
+        self.scanfreq = 20
 
-class Riot_Police(TopAgent):
+class Riot_Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
         self.scanfreq = 3
 
 
-    def update_aggression(self, neighbors):
-        pass
 
-    def move(self, neighbors = None):
-        numbers = self.numbers(neighbors)
-        if np.argmax(numbers) != 0: # Own group not largest
-            # Check quadrant to go to
-            togo = np.argmax(self.check_quadrants(), axis=0)[3]
-            self.move_quadrant(togo)
-        else:
-            self.standard_move()
