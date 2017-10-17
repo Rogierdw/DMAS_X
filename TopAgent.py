@@ -140,10 +140,9 @@ class TopAgent(Agent):
         if self.timesincefight == 0:
             if self.timesincescan >= self.scanfreq:
                 neighbors = self.scanArea(range=self.scanrange)
-                self.timesincescan = 0
-
                 self.update_aggression(neighbors)
                 self.move(neighbors)
+                self.timesincescan = 0
             else:
                 self.standard_move()
                 self.timesincescan += 1
@@ -159,12 +158,12 @@ class Non_Police(TopAgent):
         if (numbers[0] -  numbers[1]) >= self.group_larger_threshold:
             self.aggression += 1
         elif (numbers[1] - numbers[0]) <= -self.group_larger_threshold:
-            self.aggression -= 1
+            if self.aggression > 0:
+                self.aggression -= 1
         # RIOT POLICE PART??
         # RIOT POLICE PART??
 
     def move(self, neighbors):
-        numbers = self.numbers(neighbors)
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:

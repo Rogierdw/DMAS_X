@@ -4,10 +4,10 @@ from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 from TopAgent import *
 
-def compute_aggression(model):
+def mean_aggression(model):
     agent_aggression = [agent.aggression for agent in model.schedule.agents]
-    total_aggression = sum(agent_aggression)
-    return total_aggression
+    mean_aggression = sum(agent_aggression)/len(model.schedule.agents)
+    return mean_aggression
 
 def compute_fights(model):
     agent_fights = [agent.fights for agent in model.schedule.agents]
@@ -76,7 +76,7 @@ class AggressionModel(Model):
 
 
         self.datacollector = DataCollector(
-            model_reporters={"Riot": compute_aggression},
+            model_reporters={"Riot": mean_aggression },
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):

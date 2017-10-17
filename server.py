@@ -40,10 +40,10 @@ grid = CanvasGrid(agent_portrayal, 100, 100, 1000, 1000)
 
 two_groups = UserSettableParameter('checkbox', 'Two groups', value=False)
 
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 255, 0, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 45, 0, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 0, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 0, 400, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 0, 0, 400, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 400, 0, 400, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 0, 0, 400, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 100, 0, 400, 1)
 
 
 
