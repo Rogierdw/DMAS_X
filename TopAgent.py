@@ -140,7 +140,7 @@ class TopAgent(Agent):
         if self.timesincefight == 0:
             if self.timesincescan >= self.scanfreq:
                 neighbors = self.scanArea(range=self.scanrange)
-                self.timesincescan == 0
+                self.timesincescan = 0
 
                 self.update_aggression(neighbors)
                 self.move(neighbors)
