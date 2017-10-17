@@ -5,11 +5,7 @@ import numpy as np
 """ 
 TODO in general:
  - Update aggression model based on multiple agent types. 
- - Hooligans only fight normal fans now. We should fix this, so either two parties or none. Stop confusing the parties 
- from the paper of Jager et al with our different agent classes. 
- - Declare all parameters globally so we can easily tune them during testing
  - Think about how police and riot police handle aggression
- - Fix the quadrant functions
   
 TODO experiment:
  - Improve visual simulation and think of good ways to plot the data
@@ -75,43 +71,6 @@ class TopAgent(Agent):
         elif i in three:
             return 3
 
-    def check_quadrants(self):
-        quadrants = np.zeros((4, 3))
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
-        i = 0
-        for pos in neighborhood:
-            x = self.get_quadrant(i)
-            agent = self.get_agent(pos)
-            if agent is not None:
-                if type(agent) is Police or type(agent) is Riot_Police:
-                    quadrants[x,2] += 1
-                if agent.team is self.team:
-                    quadrants[x,0] += 1
-                elif agent.team is not self.team:
-                    quadrants[x,1] += 1
-            i += 1
-        return quadrants
-
-        """
-        quadrants = np.zeros((4, 4))
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
-        i = 0
-        for pos in neighborhood:
-            x = self.get_quadrant(i)
-            agent = self.get_agent(pos)
-            if agent is not None:
-                if type(agent) is Fan:
-                    quadrants[x, 0] += 1
-                elif type(agent) is Hooligan:
-                    quadrants[x, 1] += 1
-                elif type(agent) is Police:
-                    quadrants[x, 2] += 1
-                elif type(agent) is Riot_Police:
-                    quadrants[x, 3] += 1
-            i += 1
-        return quadrants
-        """
-
     def standard_move(self):
         "Standard Function for moving to empty cell next to agent"
         if random.random() < 0.95:  # 95% chance to randomly move
@@ -136,6 +95,23 @@ class TopAgent(Agent):
         else:  # 5% chance to stand still
             pass
 
+    def check_quadrants(self):
+        quadrants = np.zeros((4, 3))
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
+        i = 0
+        for pos in neighborhood:
+            x = self.get_quadrant(i)
+            agent = self.get_agent(pos)
+            if agent is not None:
+                if type(agent) is Police or type(agent) is Riot_Police:
+                    quadrants[x,2] += 1
+                if agent.team is self.team:
+                    quadrants[x,0] += 1
+                elif agent.team is not self.team:
+                    quadrants[x,1] += 1
+            i += 1
+        return quadrants
+
     def move_quadrant(self, togo):
         possible_steps = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
         if togo == 0:
@@ -159,26 +135,6 @@ class TopAgent(Agent):
             elif self.model.grid.is_cell_empty(possible_steps[7]):
                 self.model.grid.move_agent(self, possible_steps[7])
 
-    def check_fight(self):
-        if self.aggression > self.fightThreshold:
-            fight = True
-            direct_neighbors = self.scanArea(range=1)
-            if len(direct_neighbors) > 0:
-                for contact in direct_neighbors:
-                    if contact.team is not self.team:
-                        #print(str(type(contact)) + " AND " + str(type(self)))
-                        self.fight(contact)
-        else:
-            fight = False
-        return fight
-
-    def fight(self, other):
-        self.fights += .5
-        other.fights += .5
-        self.aggression = 0
-        other.aggression = 0
-        self.timesincefight = 25
-        other.timesincefight = 25
 
     def step(self):
         if self.timesincefight == 0:
@@ -204,6 +160,8 @@ class Non_Police(TopAgent):
             self.aggression += 1
         elif (numbers[1] - numbers[0]) <= -self.group_larger_threshold:
             self.aggression -= 1
+        # RIOT POLICE PART??
+        # RIOT POLICE PART??
 
     def move(self, neighbors):
         numbers = self.numbers(neighbors)
@@ -226,6 +184,27 @@ class Non_Police(TopAgent):
             togo = np.argmax(self.check_quadrants(), axis=0)[0]
             self.move_quadrant(togo)
 
+    def check_fight(self):
+        if self.aggression > self.fightThreshold:
+            fight = True
+            direct_neighbors = self.scanArea(range=1)
+            if len(direct_neighbors) > 0:
+                for contact in direct_neighbors:
+                    if contact.team is not self.team:
+                        #print(str(type(contact)) + " AND " + str(type(self)))
+                        self.fight(contact)
+        else:
+            fight = False
+        return fight
+
+    def fight(self, other):
+        self.fights += .5
+        other.fights += .5
+        self.aggression = 0
+        other.aggression = 0
+        self.timesincefight = 25
+        other.timesincefight = 25
+
 class Fan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
@@ -244,6 +223,7 @@ class Yes_Police(TopAgent):
         pass
 
     def move(self, neighbors = None):
+        ## Maybe adding behaviour to move to a fight here?
         numbers = self.numbers(neighbors)
         if np.argmax(numbers) != 2: # Police group not largest
             # Check quadrant to go to
