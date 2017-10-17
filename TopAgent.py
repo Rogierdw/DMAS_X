@@ -168,16 +168,6 @@ class Non_Police(TopAgent):
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
-                '''# check presence of other groups
-                others = np.delete(self.check_quadrants(), 0, 1)
-                others = others.astype('float')
-                others[others==0] = np.nan
-                x = np.where(others==np.nanmax(others))
-                try:
-                    pos = x[0][0],x[0][1]# IF there are any nonzero-values of neighbours, move to the first lowest one
-                    self.move_quadrant(pos)
-                except IndexError:
-                    self.standard_move()# If there are no other-group members around, move randomly'''
                 togo = np.argmax(self.check_quadrants(), axis=0)[1]
                 self.move_quadrant(togo)
         else:
@@ -220,17 +210,46 @@ class Yes_Police(TopAgent):
         super().__init__(unique_id, model, team)
 
     def update_aggression(self, neighbors):
-        pass
+        direct_neighbors = self.scanArea(range=1)
+        if len(direct_neighbors) > 0:
+            for contact in direct_neighbors:
+                if contact.timesincefight != 0:
+                    contact.timesincefight = 0
+                    contact.aggression = 10
 
-    def move(self, neighbors = None):
+    def move(self, neighbors):
         ## Maybe adding behaviour to move to a fight here?
-        numbers = self.numbers(neighbors)
-        if np.argmax(numbers) != 2: # Police group not largest
-            # Check quadrant to go to
-            togo = np.argmax(self.check_quadrants(), axis=0)[2]
-            self.move_quadrant(togo)
+        fight = self.see_fight(neighbors)
+        if fight:
+            self.move_to_most_fights()
         else:
-            self.standard_move()
+            numbers = self.numbers(neighbors)
+            if np.argmax(numbers) != 2: # Police group not largest
+                # Check quadrant to go to
+                togo = np.argmax(self.check_quadrants(), axis=0)[2]
+                self.move_quadrant(togo)
+            else:
+                self.standard_move()
+
+    def see_fight(self, neighbors):
+        for contact in neighbors:
+            if contact.timesincefight != 0:
+                return True
+        return False
+
+    def move_to_most_fights(self):
+        quadrants = np.zeros(4)
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
+        i = 0
+        for pos in neighborhood:
+            x = self.get_quadrant(i)
+            agent = self.get_agent(pos)
+            if agent is not None:
+                if agent.timesincefight != 0:
+                    quadrants[x] += 1
+            i += 1
+        togo = np.argmax(quadrants)
+        self.move_quadrant(togo)
 
 class Police(Yes_Police):
     def __init__(self, unique_id, model, team):
