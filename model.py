@@ -64,7 +64,8 @@ class AggressionModel(Model):
                 self.place_agent(a, riot_police_grouped)
 
         self.datacollector = DataCollector(
-            model_reporters={"Attacks": compute_attacks,
+            model_reporters={"Aggresiion": mean_aggression,
+                             "Attacks": compute_attacks,
                              "Police Interuptions": police_interutions})
 
     def step(self):
