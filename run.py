@@ -2,6 +2,7 @@ from model import *
 import matplotlib.pyplot as plt
 from mesa.batchrunner import BatchRunner
 from server import server
+import time
 
 #server.port = 8521 # The default
 #server.launch()
@@ -18,14 +19,30 @@ riot_police_grouped = True
 size_riot_police_groups = 5
 '''
 
-#Batch run
-params = {"N_fan": 255,
-          "N_hool": 45,
-          "N_pol": 85,
-          "twogroup_switch": False,
-          "riot_police_grouped": False,
-          "N_riopol": range(5,100, 5)}
 
+
+
+
+#Batch run
+params = {"N_fan": 328,
+          "N_hool": 110,
+          "N_pol": 46,
+          "N_riopol": 16,
+          "twogroup_switch": False,
+          "riot_police_grouped": False}
+
+start_time = time.time()
+model = AggressionModel(N_fan = 328, N_hool = 110, N_pol = 46, N_riopol = 16, width = 100, height = 100, twogroup_switch = False, riot_police_grouped = False, size_riot_police_groups = 5)
+for i in range(5400):
+    model.step()
+    print("step: " + str(i) + ' at time: ' + str(time.time()-start_time))
+
+aggression = model.datacollector.get_model_vars_dataframe()
+aggression.plot()
+plt.show()
+
+
+'''
 batch_run = BatchRunner(AggressionModel,
                         parameter_values=params,
                         iterations=1,
@@ -36,7 +53,8 @@ batch_run = BatchRunner(AggressionModel,
 batch_run.run_all()
 
 run_data = batch_run.get_model_vars_dataframe()
-run_data.to_csv('test1.csv')
+run_data.to_csv('basecase.csv')
 
 #plt.scatter(run_data.N_riopol, run_data.Attacks)
 #plt.show()
+'''

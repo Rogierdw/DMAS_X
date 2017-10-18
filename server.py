@@ -53,9 +53,6 @@ chart2 = ChartModule([{"Label": "Attacks",
                       "Color": "Black"}],
                     data_collector_name='datacollector')
 
-chart3 = ChartModule([{"Label": "Attacked",
-                      "Color": "Black"}],
-                    data_collector_name='datacollector')
 
 chart4 = ChartModule([{"Label": "Police interuptions",
                       "Color": "Blue"}],
@@ -63,7 +60,7 @@ chart4 = ChartModule([{"Label": "Police interuptions",
 
 
 server = ModularServer(AggressionModel, # Which model
-                       [grid, chart2, chart3, chart4], # Add what to page
+                       [grid, chart2, chart4], # Add what to page
                        "Aggression Model", # Title
                        {"N_fan": n_slider_fan, # Actual parameters for __init__ of model
                         "N_hool": n_slider_hool,

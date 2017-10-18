@@ -14,20 +14,6 @@ def compute_attacks(model):
     total_attacks = sum(agent_attacks)
     return total_attacks
 
-def compute_attacked(model):
-    agent_attacked = [agent.attacked for agent in model.schedule.agents]
-    total_attacked = sum(agent_attacked)
-    return total_attacked
-
-def clustering_group(model):
-    mean_neighbors = 0
-    for agent in model.schedule.agents:
-        neighbors = model.grid.get_neighbors(agent.pos, moore=True, include_center=False, radius=5)
-        for neighbor in neighbors:
-            if agent.team == neighbor.team:
-                mean_neighbors += 1
-    mean_neighbors /= len(model.schedule.agents)
-    return mean_neighbors
 
 def police_interutions(model):
     police_interutions = [agent.police_interuptions for agent in model.schedule.agents]
@@ -79,7 +65,6 @@ class AggressionModel(Model):
 
         self.datacollector = DataCollector(
             model_reporters={"Attacks": compute_attacks,
-                             "Attacked": compute_attacked,
                              "Police Interuptions": police_interutions},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
