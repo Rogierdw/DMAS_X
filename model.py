@@ -41,7 +41,7 @@ class AggressionModel(Model):
                 else:
                     a = Riot_Police(i, self, None)
                 self.schedule.add(a)
-                self.determinepos(a)
+                self.place_agent(a)
         else:
             for i in range(self.num_agents):
                 if i < N_fan:
@@ -53,7 +53,7 @@ class AggressionModel(Model):
                 else:
                     a = Riot_Police(i, self, False)
                 self.schedule.add(a)
-                self.determinepos(a)
+                self.place_agent(a)
 
         self.datacollector = DataCollector(
             model_reporters={"Riot": mean_aggression ,
@@ -65,8 +65,7 @@ class AggressionModel(Model):
         self.datacollector.collect(self)
         self.schedule.step()
 
-
-    def determinepos(self,a):
+    def place_agent(self,a):
         x = 1
         y = 1
         placed = False
@@ -85,19 +84,17 @@ class AggressionModel(Model):
                     x = random.randrange(self.grid.width)
                     y = random.randrange(self.grid.height)
 
-
-
-        # Finds agents (length of array) with corresponding position and return this
     def findagents(self):
+        # Finds agents (length of array) with corresponding position and return this
         locations=[]
         for row in range(self.grid.width):
             for col in range(self.grid.height):
                 if self.grid[row][col] is not None:
                    locations.append((row,col,type(self.grid[row][col])))
         return locations
-  
-    # Places the agent in a group with other agents, if none are available or no spots available place on a random spot, so random distribution of group size as model property
+
     def place_grouped(self,a):
+        # Places the agent in a group with other agents, if none are available or no spots available place on a random spot, so random distribution of group size as model property
         temp_placed=False
         x=1
         y=1
@@ -111,13 +108,9 @@ class AggressionModel(Model):
                 x = random.randrange(self.grid.width)
                 y = random.randrange(self.grid.height)
 
-        
         # If there is an agent of Riot police with less than size members in his range, then return empty x,y in neighborhood-space. Else pick random x,y
         foundgroup = False
-
         agents = self.findagents()
-
-        
         for agent in agents:   # all the agents in the grid
             if(agent[2]==Riot_Police):      # 3rd position represents type
                 if(foundgroup):
@@ -141,7 +134,6 @@ class AggressionModel(Model):
                             finalpos=position
                             found = True
                             break
-        
         # pos of new agent
         return finalpos
 
