@@ -19,6 +19,23 @@ def compute_attacked(model):
     total_attacked = sum(agent_attacked)
     return total_attacked
 
+def clustering_group(model):
+    mean_neighbors = 0
+    for agent in model.schedule.agents:
+        neighbors = model.grid.get_neighbors(agent.pos, moore=True, include_center=False, radius=5)
+        for neighbor in neighbors:
+            if agent.team == neighbor.team:
+                mean_neighbors += 1
+    mean_neighbors /= len(model.schedule.agents)
+    return mean_neighbors
+
+def police_interutions(model):
+    police_interutions = [agent.police_interuptions for agent in model.schedule.agents]
+    total_interuptions = sum(police_interutions)
+    return total_interuptions
+
+
+
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""
     def __init__(self, N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch, riot_police_grouped, size_riot_police_groups = 5):
@@ -61,9 +78,10 @@ class AggressionModel(Model):
                 self.place_agent(a, riot_police_grouped)
 
         self.datacollector = DataCollector(
-            model_reporters={"Aggression": mean_aggression ,
-                             "Attacks": compute_attacks,
-                             "Attacked": compute_attacked},
+            model_reporters={"Attacks": compute_attacks,
+                             "Attacked": compute_attacked,
+                             "Police Interuptions": police_interutions,
+                             "Clustering": clustering_group},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):

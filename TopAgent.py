@@ -31,6 +31,7 @@ class TopAgent(Agent):
         self.team = team
         self.fightThreshold = 25
         self.group_larger_threshold = 10
+        self.police_interuptions = 0
 
     def scanArea(self, range):
         """ Returns number of agents within a certain range to scan the area """
@@ -219,6 +220,7 @@ class Yes_Police(TopAgent):
                     neighbors = self.scanArea(self.scanrange)
                     for neighbor in neighbors:
                         neighbor.aggression += self.police_aggression
+                    self.police_interuptions += 1
 
 
     def move(self, neighbors):
