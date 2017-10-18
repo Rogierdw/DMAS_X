@@ -48,12 +48,16 @@ n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 100, 
 
 
 
-chart = ChartModule([{"Label": "Riot",
+chart1 = ChartModule([{"Label": "Riot",
+                      "Color": "Black"}],
+                    data_collector_name='datacollector')
+
+chart2 = ChartModule([{"Label": "Fights",
                       "Color": "Black"}],
                     data_collector_name='datacollector')
 
 server = ModularServer(AggressionModel, # Which model
-                       [grid, chart], # Add what to page
+                       [grid, chart1, chart2], # Add what to page
                        "Aggression Model", # Title
                        {"N_fan": n_slider_fan, # Actual parameters for __init__ of model
                         "N_hool": n_slider_hool,

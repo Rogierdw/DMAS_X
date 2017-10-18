@@ -10,7 +10,7 @@ def mean_aggression(model):
     return mean_aggression
 
 def compute_fights(model):
-    agent_fights = [agent.fights for agent in model.schedule.agents]
+    agent_fights = [agent.attacked for agent in model.schedule.agents]
     total_fights = sum(agent_fights)
     return total_fights
 
@@ -42,8 +42,6 @@ class AggressionModel(Model):
                     a = Riot_Police(i, self, None)
                 self.schedule.add(a)
                 self.determinepos(a)
-
-
         else:
             for i in range(self.num_agents):
                 if i < N_fan:
@@ -57,9 +55,9 @@ class AggressionModel(Model):
                 self.schedule.add(a)
                 self.determinepos(a)
 
-
         self.datacollector = DataCollector(
-            model_reporters={"Riot": mean_aggression },
+            model_reporters={"Riot": mean_aggression ,
+                             "Fights": compute_fights},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):

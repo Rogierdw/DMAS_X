@@ -8,23 +8,23 @@ server.port = 8521 # The default
 server.launch()
 
 '''
-model = AggressionModel(100, 10, 10)
+N_fan = 500
+N_hool = 100
+N_pol = 60
+N_riopol = 12
+width = 100
+height = 100
+twogroup_switch = False
+
+model = AggressionModel(N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch)
 for i in range(100):
     model.step()
-gini = model.datacollector.get_model_vars_dataframe()
-gini.plot()
+fights = model.datacollector.get_model_vars_dataframe()
+fights.plot()
 plt.show()
 agent_aggression = model.datacollector.get_agent_vars_dataframe()
 print(agent_aggression.head())
 
-agent_counts = np.zeros((model.grid.width, model.grid.height))
-for cell in model.grid.coord_iter():
-    cell_content, x, y = cell
-    agent_count = len(cell_content)
-    agent_counts[x][y] = agent_count
-plt.imshow(agent_counts, interpolation='nearest')
-plt.colorbar()
-plt.show()
 
 #Plot wealth at end of simulation (After Run 99)
 end_aggression = agent_aggression.xs(99, level="Step")["Aggression"]

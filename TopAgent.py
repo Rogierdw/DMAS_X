@@ -25,7 +25,8 @@ class TopAgent(Agent):
         self.timesincescan = 0
         self.model = model
         self.timesincefight = 0
-        self.fights = 0
+        self.attacks = 0
+        self.attacked = 0
         self.scanrange = 5
         self.team = team
         self.fightThreshold = 25
@@ -160,8 +161,6 @@ class Non_Police(TopAgent):
         elif (numbers[1] - numbers[0]) <= -self.group_larger_threshold:
             if self.aggression > 0:
                 self.aggression -= 1
-        # RIOT POLICE PART??
-        # RIOT POLICE PART??
 
     def move(self, neighbors):
         if self.aggression > 15:
@@ -187,8 +186,8 @@ class Non_Police(TopAgent):
         return fight
 
     def fight(self, other):
-        self.fights += .5
-        other.fights += .5
+        self.attacks += 1
+        other.attacked += 1
         self.aggression = 0
         other.aggression = 0
         self.timesincefight = 25
@@ -197,24 +196,30 @@ class Non_Police(TopAgent):
 class Fan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
+        self.scanfreq = 10
 
 class Hooligan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 3
+        self.scanfreq = 2
 
 class Yes_Police(TopAgent):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
+        self.police_aggression = 2
 
     def update_aggression(self, neighbors):
+        self.aggresssion = 0
         direct_neighbors = self.scanArea(range=1)
         if len(direct_neighbors) > 0:
             for contact in direct_neighbors:
                 if contact.timesincefight != 0:
                     contact.timesincefight = 0
                     contact.aggression = 10
+                    neighbors = self.scanArea(self.scanrange)
+                    for neighbor in neighbors:
+                        neighbor.aggression += self.police_aggression
+
 
     def move(self, neighbors):
         ## Maybe adding behaviour to move to a fight here?
@@ -253,12 +258,13 @@ class Yes_Police(TopAgent):
 class Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
+        self.scanfreq = 10
+        self.police_aggression = 2
 
 class Riot_Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 3
-
+        self.scanfreq = 2
+        self.police_aggression = 5
 
 
