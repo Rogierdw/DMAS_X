@@ -202,12 +202,12 @@ class Fan(Non_Police):
 class Hooligan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 3
+        self.scanfreq = 4
 
 class Yes_Police(TopAgent):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.police_aggression = 1
+        self.police_aggression = 2
 
     def update_aggression(self, neighbors):
         self.aggresssion = 0
@@ -260,13 +260,11 @@ class Yes_Police(TopAgent):
 class Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
-        self.police_aggression = 2
+        self.scanfreq = 4
 
 class Riot_Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 3
-        self.police_aggression = 5
+        self.scanfreq = 2
 
 

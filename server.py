@@ -39,12 +39,12 @@ def agent_portrayal(agent):
 grid = CanvasGrid(agent_portrayal, 100, 100, 1000, 1000)
 
 two_groups = UserSettableParameter('checkbox', 'Two groups', value=False)
-riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = True)
+riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = False)
 
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 255, 0, 400, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 45, 0, 400, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 0, 400, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 0, 400, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 510, 0, 800, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 90, 0, 200, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 170, 0, 200, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 30, 0, 50, 1)
 
 size_riot_police_groups = UserSettableParameter("slider", "initial group size of Riot Police", 5, 1, 5, 1)
 
@@ -61,12 +61,9 @@ chart4 = ChartModule([{"Label": "Police interuptions",
                       "Color": "Blue"}],
                     data_collector_name='datacollector')
 
-chart5 = ChartModule([{"Label": "Clustering",
-                      "Color": "Red"}],
-                    data_collector_name='datacollector')
 
 server = ModularServer(AggressionModel, # Which model
-                       [grid, chart2, chart3, chart4, chart5], # Add what to page
+                       [grid, chart2, chart3, chart4], # Add what to page
                        "Aggression Model", # Title
                        {"N_fan": n_slider_fan, # Actual parameters for __init__ of model
                         "N_hool": n_slider_hool,

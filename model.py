@@ -80,8 +80,7 @@ class AggressionModel(Model):
         self.datacollector = DataCollector(
             model_reporters={"Attacks": compute_attacks,
                              "Attacked": compute_attacked,
-                             "Police Interuptions": police_interutions,
-                             "Clustering": clustering_group},
+                             "Police Interuptions": police_interutions},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):
