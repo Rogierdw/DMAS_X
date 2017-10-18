@@ -9,10 +9,15 @@ def mean_aggression(model):
     mean_aggression = sum(agent_aggression)/len(model.schedule.agents)
     return mean_aggression
 
-def compute_fights(model):
-    agent_fights = [agent.attacked for agent in model.schedule.agents]
-    total_fights = sum(agent_fights)
-    return total_fights
+def compute_attacks(model):
+    agent_attacks = [agent.attacks for agent in model.schedule.agents]
+    total_attacks = sum(agent_attacks)
+    return total_attacks
+
+def compute_attacked(model):
+    agent_attacked = [agent.attacked for agent in model.schedule.agents]
+    total_attacked = sum(agent_attacked)
+    return total_attacked
 
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""
@@ -56,8 +61,9 @@ class AggressionModel(Model):
                 self.place_agent(a, riot_police_grouped)
 
         self.datacollector = DataCollector(
-            model_reporters={"Riot": mean_aggression ,
-                             "Fights": compute_fights},
+            model_reporters={"Aggression": mean_aggression ,
+                             "Attacks": compute_attacks,
+                             "Attacked": compute_attacked},
             agent_reporters={"Aggression": lambda a: a.aggression})
 
     def step(self):
