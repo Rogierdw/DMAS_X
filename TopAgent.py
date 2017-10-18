@@ -197,7 +197,7 @@ class Non_Police(TopAgent):
 class Fan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 20
+        self.scanfreq = 8
 
 class Hooligan(Non_Police):
     def __init__(self, unique_id, model, team):

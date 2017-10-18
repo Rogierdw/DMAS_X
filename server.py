@@ -43,8 +43,8 @@ riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', v
 
 n_slider_fan = UserSettableParameter('slider', "Number of Fans", 510, 0, 800, 1)
 n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 90, 0, 200, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 170, 0, 200, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 30, 0, 50, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 0, 200, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 0, 50, 1)
 
 size_riot_police_groups = UserSettableParameter("slider", "initial group size of Riot Police", 5, 1, 5, 1)
 

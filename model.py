@@ -78,7 +78,7 @@ class AggressionModel(Model):
         placed = False
 
         # For riot police, place different
-        if(riot_police_grouped and type(a)==Riot_Police):
+        if(riot_police_grouped and (type(a)==Riot_Police or type(a)==Police)):
             x,y = self.place_grouped(a)
             self.grid.place_agent(a,(x,y))
         else:
