@@ -45,7 +45,7 @@ n_slider_fan = UserSettableParameter('slider', "Number of Fans", 0, 0, 400, 1)
 n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 400, 0, 400, 1)
 n_slider_pol = UserSettableParameter('slider', "Number of Police", 0, 0, 400, 1)
 n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 50, 0, 400, 1)
-
+size_riot_police_groups = UserSettableParameter("slider", "group size of Riot Police", 5, 1, 5, 1)
 
 
 
@@ -70,7 +70,8 @@ server = ModularServer(AggressionModel, # Which model
                         "N_riopol": n_slider_riopol,
                         "width": 100, "height": 100,
                         "twogroup_switch": two_groups,
-                        "riot_police_grouped": riot_police_grouped})
+                        "riot_police_grouped": riot_police_grouped,
+                        "size_riot_police_groups": size_riot_police_groups})
 
 
 

@@ -15,9 +15,10 @@ N_riopol = 12
 width = 100
 height = 100
 twogroup_switch = False
-riot_police_grouped = False
+riot_police_grouped = True
+size_riot_police_groups = 5
 
-model = AggressionModel(N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch)
+model = AggressionModel(N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch, riot_police_grouped, size_riot_police_groups)
 for i in range(100):
     model.step()
 fights = model.datacollector.get_model_vars_dataframe()
