@@ -37,8 +37,8 @@ for i in range(5400):
     model.step()
     print("step: " + str(i) + ' at time: ' + str(time.time()-start_time))
 
-aggression = model.datacollector.get_model_vars_dataframe()
-aggression.plot()
+data = model.datacollector.get_model_vars_dataframe()
+data.plot()
 plt.show()
 
 

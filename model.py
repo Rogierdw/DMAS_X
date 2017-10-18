@@ -65,8 +65,7 @@ class AggressionModel(Model):
 
         self.datacollector = DataCollector(
             model_reporters={"Attacks": compute_attacks,
-                             "Police Interuptions": police_interutions},
-            agent_reporters={"Aggression": lambda a: a.aggression})
+                             "Police Interuptions": police_interutions})
 
     def step(self):
         '''Advance the model by one step.'''
