@@ -16,7 +16,7 @@ def compute_fights(model):
 
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""
-    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch):
+    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch, riot_police_grouped):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
         self.num_agents = N_fan + N_hool + N_pol + N_riopol
         self.grid = SingleGrid(width, height, True) # Boolean is for wrap-around, SingleGrid enforces one agent/cell
@@ -41,7 +41,7 @@ class AggressionModel(Model):
                 else:
                     a = Riot_Police(i, self, None)
                 self.schedule.add(a)
-                self.place_agent(a)
+                self.place_agent(a, riot_police_grouped)
         else:
             for i in range(self.num_agents):
                 if i < N_fan:
@@ -53,7 +53,7 @@ class AggressionModel(Model):
                 else:
                     a = Riot_Police(i, self, False)
                 self.schedule.add(a)
-                self.place_agent(a)
+                self.place_agent(a, riot_police_grouped)
 
         self.datacollector = DataCollector(
             model_reporters={"Riot": mean_aggression ,
@@ -65,13 +65,13 @@ class AggressionModel(Model):
         self.datacollector.collect(self)
         self.schedule.step()
 
-    def place_agent(self,a):
+    def place_agent(self,a, riot_police_grouped):
         x = 1
         y = 1
         placed = False
 
         # For riot police, place different
-        if(type(a)==Riot_Police):
+        if(riot_police_grouped and type(a)==Riot_Police):
             x,y = self.place_grouped(a)
             self.grid.place_agent(a,(x,y))
         else:

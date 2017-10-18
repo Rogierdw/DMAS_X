@@ -15,6 +15,7 @@ N_riopol = 12
 width = 100
 height = 100
 twogroup_switch = False
+riot_police_grouped = False
 
 model = AggressionModel(N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch)
 for i in range(100):

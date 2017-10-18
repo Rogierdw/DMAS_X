@@ -39,6 +39,7 @@ def agent_portrayal(agent):
 grid = CanvasGrid(agent_portrayal, 100, 100, 1000, 1000)
 
 two_groups = UserSettableParameter('checkbox', 'Two groups', value=False)
+riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = False)
 
 n_slider_fan = UserSettableParameter('slider', "Number of Fans", 0, 0, 400, 1)
 n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 400, 0, 400, 1)
@@ -64,7 +65,8 @@ server = ModularServer(AggressionModel, # Which model
                         "N_pol": n_slider_pol,
                         "N_riopol": n_slider_riopol,
                         "width": 100, "height": 100,
-                        "twogroup_switch": two_groups})
+                        "twogroup_switch": two_groups,
+                        "riot_police_grouped": riot_police_grouped})
 
 
 
