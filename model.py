@@ -122,7 +122,7 @@ class AggressionModel(Model):
                 if(foundgroup):
                     break
                 pos = (agent[0],agent[1])  # Row/Col combined
-                neighbors = self.grid.get_neighbors(pos,moore=True,include_center=False,radius=1)
+                neighbors = self.grid.get_neighbors(pos,moore=True,include_center=False,radius=3)
                 count = 0
 
                 for neighbor in neighbors:

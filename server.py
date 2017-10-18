@@ -39,7 +39,7 @@ def agent_portrayal(agent):
 grid = CanvasGrid(agent_portrayal, 100, 100, 500, 500)
 
 two_groups = UserSettableParameter('checkbox', 'Two groups', value=False)
-riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = False)
+riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = True)
 
 n_slider_fan = UserSettableParameter('slider', "Number of Fans", 0, 0, 400, 1)
 n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 400, 0, 400, 1)
