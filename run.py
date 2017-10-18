@@ -28,8 +28,8 @@ params = {"N_fan": 255,
 
 batch_run = BatchRunner(AggressionModel,
                         parameter_values=params,
-                        iterations=5,
-                        max_steps=100,
+                        iterations=1,
+                        max_steps=5400,
                         model_reporters={"Attacks": compute_attacks,
                              "Attacked": compute_attacked,
                              "Police Interuptions": police_interutions})
