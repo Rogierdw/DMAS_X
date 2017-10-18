@@ -38,7 +38,7 @@ def police_interutions(model):
 
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""
-    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width, height, twogroup_switch, riot_police_grouped, size_riot_police_groups = 5):
+    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width = 100, height = 100, twogroup_switch = False, riot_police_grouped = False, size_riot_police_groups = 5):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
         self.num_agents = N_fan + N_hool + N_pol + N_riopol
         self.grid = SingleGrid(width, height, True) # Boolean is for wrap-around, SingleGrid enforces one agent/cell
