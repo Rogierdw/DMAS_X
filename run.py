@@ -4,8 +4,8 @@ from mesa.batchrunner import BatchRunner
 from server import server
 import time
 
-#server.port = 8521 # The default
-#server.launch()
+server.port = 8521 # The default
+server.launch()
 
 '''
 N_fan = 500
@@ -21,9 +21,8 @@ size_riot_police_groups = 5
 
 
 
-
-
-#Batch run
+'''
+# Single run
 params = {"N_fan": 328,
           "N_hool": 110,
           "N_pol": 46,
@@ -42,18 +41,19 @@ data.plot()
 plt.show()
 
 
-'''
-batch_run = BatchRunner(AggressionModel,
-                        parameter_values=params,
-                        iterations=1,
-                        max_steps=5400,
-                        model_reporters={"Attacks": compute_attacks,
-                             "Attacked": compute_attacked,
-                             "Police Interuptions": police_interutions})
-batch_run.run_all()
 
-run_data = batch_run.get_model_vars_dataframe()
-run_data.to_csv('basecase.csv')
+#Batch run
+#batch_run = BatchRunner(AggressionModel,
+#                        parameter_values=params,
+#                        iterations=1,
+#                        max_steps=5400,
+#                        model_reporters={"Attacks": compute_attacks,
+#                             "Attacked": compute_attacked,
+#                             "Police Interuptions": police_interutions})
+#batch_run.run_all()
+
+#run_data = batch_run.get_model_vars_dataframe()
+#run_data.to_csv('basecase.csv')
 
 #plt.scatter(run_data.N_riopol, run_data.Attacks)
 #plt.show()
