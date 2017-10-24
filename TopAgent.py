@@ -107,10 +107,11 @@ class TopAgent(Agent):
             if agent is not None:
                 if type(agent) is Police or type(agent) is Riot_Police:
                     quadrants[x,2] += 1
-                if agent.team is self.team:
-                    quadrants[x,0] += 1
-                elif agent.team is not self.team:
-                    quadrants[x,1] += 1
+                if agent.team is not None:
+                    if agent.team is self.team:
+                        quadrants[x,0] += 1
+                    elif agent.team is not self.team:
+                        quadrants[x,1] += 1
             i += 1
         return quadrants
 
@@ -140,7 +141,7 @@ class TopAgent(Agent):
 
     def step(self):
         if self.timesincefight == 0:
-            if self.timesincescan >= self.scanfreq:
+            if self.timesincescan >= self.scaninterval:
                 neighbors = self.scanArea(range=self.scanrange)
                 self.update_aggression(neighbors)
                 self.move(neighbors)
@@ -159,7 +160,7 @@ class Non_Police(TopAgent):
         numbers = self.numbers(neighbors)
         if (numbers[0] -  numbers[1]) >= self.group_larger_threshold:
             self.aggression += 1
-        elif (numbers[1] - numbers[0]) <= -self.group_larger_threshold:
+        elif (numbers[0] - numbers[1]) <= -self.group_larger_threshold:
             if self.aggression > 0:
                 self.aggression -= 1
 
@@ -179,9 +180,10 @@ class Non_Police(TopAgent):
             direct_neighbors = self.scanArea(range=1)
             if len(direct_neighbors) > 0:
                 for contact in direct_neighbors:
-                    if contact.team is not self.team:
-                        #print(str(type(contact)) + " AND " + str(type(self)))
-                        self.fight(contact)
+                    if contact.team is not None:
+                        if contact.team is not self.team:
+                            #print(str(type(contact)) + " AND " + str(type(self)))
+                            self.fight(contact)
         else:
             fight = False
         return fight
@@ -197,12 +199,12 @@ class Non_Police(TopAgent):
 class Fan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 8
+        self.scaninterval = 8
 
 class Hooligan(Non_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 4
+        self.scaninterval = 4
 
 class Yes_Police(TopAgent):
     def __init__(self, unique_id, model, team):
@@ -260,11 +262,11 @@ class Yes_Police(TopAgent):
 class Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 4
+        self.scaninterval = 4
 
 class Riot_Police(Yes_Police):
     def __init__(self, unique_id, model, team):
         super().__init__(unique_id, model, team)
-        self.scanfreq = 2
+        self.scaninterval = 2
 
 

@@ -38,16 +38,20 @@ def agent_portrayal(agent):
 
 grid = CanvasGrid(agent_portrayal, 100, 100, 1000, 1000)
 
-two_groups = UserSettableParameter('checkbox', 'Two groups', value=False)
+two_groups = UserSettableParameter('checkbox', 'Two groups', value=True)
+group_a_proportion = UserSettableParameter('slider', "Group A proportion", 0.25, 0, 0.50, 0.05)
 riot_police_grouped = UserSettableParameter('checkbox', 'Grouped Riot Police', value = False)
 
-n_slider_fan = UserSettableParameter('slider', "Number of Fans", 510, 0, 800, 1)
-n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 90, 0, 200, 1)
-n_slider_pol = UserSettableParameter('slider', "Number of Police", 85, 0, 200, 1)
-n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 15, 0, 50, 1)
+n_slider_fan = UserSettableParameter('slider', "Number of Fans", 300, 0, 800, 1)
+n_slider_hool = UserSettableParameter('slider', "Number of Hooligans", 200, 0, 200, 1)
+n_slider_pol = UserSettableParameter('slider', "Number of Police", 0, 0, 200, 1)
+n_slider_riopol = UserSettableParameter('slider', "Number of Riot police", 0, 0, 50, 1)
 
-size_riot_police_groups = UserSettableParameter("slider", "initial group size of Riot Police", 5, 1, 5, 1)
+#size_riot_police_groups = UserSettableParameter("slider", "initial group size of Riot Police", 5, 1, 5, 1)
 
+chart = ChartModule([{"Label": "Aggression",
+                      "Color": "Red"}],
+                    data_collector_name='datacollector')
 
 chart2 = ChartModule([{"Label": "Attacks",
                       "Color": "Black"}],
@@ -60,7 +64,7 @@ chart4 = ChartModule([{"Label": "Police interuptions",
 
 
 server = ModularServer(AggressionModel, # Which model
-                       [grid, chart2, chart4], # Add what to page
+                       [grid, chart, chart2, chart4], # Add what to page
                        "Aggression Model", # Title
                        {"N_fan": n_slider_fan, # Actual parameters for __init__ of model
                         "N_hool": n_slider_hool,
@@ -68,8 +72,8 @@ server = ModularServer(AggressionModel, # Which model
                         "N_riopol": n_slider_riopol,
                         "width": 100, "height": 100,
                         "twogroup_switch": two_groups,
-                        "riot_police_grouped": riot_police_grouped,
-                        "size_riot_police_groups": size_riot_police_groups})
+                        "group_a_proportion": group_a_proportion,
+                        "riot_police_grouped": riot_police_grouped})
 
 
 

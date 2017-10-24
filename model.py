@@ -5,8 +5,8 @@ from mesa.datacollection import DataCollector
 from TopAgent import *
 
 def mean_aggression(model):
-    agent_aggression = [agent.aggression for agent in model.schedule.agents]
-    mean_aggression = sum(agent_aggression)/len(model.schedule.agents)
+    agent_aggression = [agent.aggression for agent in model.schedule.agents if (type(agent) is not Police or type(agent) is not Riot_Police)]
+    mean_aggression = sum(agent_aggression)/model.num_non_police
     return mean_aggression
 
 def compute_attacks(model):
@@ -24,8 +24,9 @@ def police_interutions(model):
 
 class AggressionModel(Model):
     """A model simulating aggression and the onset of riots in crowd behavior."""
-    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width = 100, height = 100, twogroup_switch = False, riot_police_grouped = False, size_riot_police_groups = 5):
+    def __init__(self, N_fan, N_hool, N_pol, N_riopol, width = 100, height = 100, twogroup_switch = False, group_a_proportion = 0.25, riot_police_grouped = False, size_riot_police_groups = 5):
         self.running = True # enables conditional shut off of the model (is now set True indefinitely)
+        self.num_non_police = N_fan + N_hool
         self.num_agents = N_fan + N_hool + N_pol + N_riopol
         self.grid = SingleGrid(width, height, True) # Boolean is for wrap-around, SingleGrid enforces one agent/cell
         self.schedule = RandomActivation(self) # Means agent activation ordering is random
@@ -33,16 +34,16 @@ class AggressionModel(Model):
 
         if twogroup_switch:
             # Create agents
-            half_fan = N_fan / 2
-            half_hool = N_hool / 2
+            fan_a = int(N_fan * group_a_proportion)
+            hool_a = int(N_hool * group_a_proportion)
             for i in range(self.num_agents):
-                if i < half_fan:
+                if i < fan_a:
                     a = Fan(i, self, True) # True and False are the party
-                elif i < (2*half_fan):
+                elif i < N_fan:
                     a = Fan(i, self, False)
-                elif i < (2*half_fan) + half_hool:
+                elif i < N_fan + hool_a:
                     a = Hooligan(i, self, True)
-                elif i < (2 * half_fan) + (2 * half_hool):
+                elif i < N_fan + N_hool:
                     a = Hooligan(i, self, False)
                 elif i < N_fan + N_hool + N_pol:
                     a = Police(i, self, None)
@@ -64,7 +65,7 @@ class AggressionModel(Model):
                 self.place_agent(a, riot_police_grouped)
 
         self.datacollector = DataCollector(
-            model_reporters={"Aggresiion": mean_aggression,
+            model_reporters={"Aggression": mean_aggression,
                              "Attacks": compute_attacks,
                              "Police Interuptions": police_interutions})
 
@@ -83,9 +84,8 @@ class AggressionModel(Model):
             x,y = self.place_grouped(a)
             self.grid.place_agent(a,(x,y))
         else:
-            # if not riot, place random
             while not placed:
-                if (x,y) in self.grid.empties:
+                if (x, y) in self.grid.empties:
                     self.grid.place_agent(a, (x, y))
                     placed = True
                 else:

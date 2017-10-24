@@ -10,15 +10,16 @@ import time
 # Single run
 
 start_time = time.time()
-model = AggressionModel(N_fan = 300, N_hool = 100, N_pol = 60, N_riopol = 40, width = 100, height = 100, twogroup_switch = False, riot_police_grouped = False, size_riot_police_groups = 5)
+model = AggressionModel(N_fan = 300, N_hool = 200, N_pol = 0, N_riopol = 0, twogroup_switch = True)
 for i in range(5400):
     model.step()
     print("step: " + str(i) + ' at time: ' + str(time.time()-start_time))
 
 data = model.datacollector.get_model_vars_dataframe()
-data.to_csv('testcase.csv')
+data.to_csv('two_party.csv')
 data.plot()
 plt.show()
+
 
 
 
