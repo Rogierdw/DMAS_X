@@ -52,6 +52,7 @@ class TopAgent(Agent):
         return numbers
 
     def get_agent(self, pos):
+        """ Returns agent on pos if present"""
         if not self.model.grid.is_cell_empty(pos):
             agents = self.model.grid.get_neighbors(pos, moore=True, include_center=True, radius=0)
             return agents[0]
@@ -59,7 +60,7 @@ class TopAgent(Agent):
             return None
 
     def get_quadrant(self, i):
-        """" TODO: Make this less static so we can still tune the scan range of the agents. """
+        """" returns quadrant for scanrange=5 """
         zero = [0,1,2,3,4,8,9,10,11,12,17,18,19,20,21,26,27,27,28,29,30]
         one = [5,6,7,13,14,15,16,22,23,24,25,31,32,33,34,40,41,42,43,44]
         two = [35,36,37,38,39,45,46,47,48,54,55,56,57,63,64,65,66,72,73,74]
@@ -74,7 +75,7 @@ class TopAgent(Agent):
             return 3
 
     def standard_move(self):
-        "Standard Function for moving to empty cell next to agent"
+        "Standard Function for moving to random empty cell next to agent, 95% chance"
         if random.random() < 0.95:  # 95% chance to randomly move
             moved = False
             tries = 0
@@ -98,6 +99,7 @@ class TopAgent(Agent):
             pass
 
     def check_quadrants(self):
+        """Return nd-array with agent types per quadrant"""
         quadrants = np.zeros((4, 3))
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
         i = 0
@@ -116,6 +118,7 @@ class TopAgent(Agent):
         return quadrants
 
     def move_quadrant(self, togo):
+        """ Move to a certain quadrant (0-3) if space"""
         possible_steps = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
         if togo == 0:
             if self.model.grid.is_cell_empty(possible_steps[0]):
@@ -140,6 +143,7 @@ class TopAgent(Agent):
 
 
     def step(self):
+        """ Each time step this function is exectued for all agents"""
         if self.timesincefight == 0:
             if self.timesincescan >= self.scaninterval:
                 neighbors = self.scanArea(range=self.scanrange)
@@ -157,6 +161,7 @@ class Non_Police(TopAgent):
         super().__init__(unique_id, model, team)
 
     def update_aggression(self, neighbors):
+        """ Updates aggression according to number of own and other team"""
         numbers = self.numbers(neighbors)
         if (numbers[0] -  numbers[1]) >= self.group_larger_threshold:
             self.aggression += 1
@@ -165,6 +170,7 @@ class Non_Police(TopAgent):
                 self.aggression -= 1
 
     def move(self, neighbors):
+        """ Fight or move according to aggression level"""
         if self.aggression > 15:
             fight = self.check_fight()
             if not fight:
@@ -175,6 +181,7 @@ class Non_Police(TopAgent):
             self.move_quadrant(togo)
 
     def check_fight(self):
+        """ Check if willing to fight and neighbor is other team"""
         if self.aggression > self.fightThreshold:
             fight = True
             direct_neighbors = self.scanArea(range=1)
@@ -189,6 +196,7 @@ class Non_Police(TopAgent):
         return fight
 
     def fight(self, other):
+        """ Fight """
         self.attacks += 1
         other.attacked += 1
         self.aggression = 0
@@ -212,6 +220,7 @@ class Yes_Police(TopAgent):
         self.police_aggression = 2
 
     def update_aggression(self, neighbors):
+        """ Own aggression always 0, breaks up fights"""
         self.aggresssion = 0
         direct_neighbors = self.scanArea(range=1)
         if len(direct_neighbors) > 0:
@@ -226,7 +235,7 @@ class Yes_Police(TopAgent):
 
 
     def move(self, neighbors):
-        ## Maybe adding behaviour to move to a fight here?
+        """ Will move to fight if one is seen, otherwise will group or move randomly"""
         fight = self.see_fight(neighbors)
         if fight:
             self.move_to_most_fights()
@@ -240,12 +249,14 @@ class Yes_Police(TopAgent):
                 self.standard_move()
 
     def see_fight(self, neighbors):
+        """ Checks surroundings for fights"""
         for contact in neighbors:
             if contact.timesincefight != 0:
                 return True
         return False
 
     def move_to_most_fights(self):
+        """ Move to quadrant with most fights """
         quadrants = np.zeros(4)
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=5)
         i = 0
